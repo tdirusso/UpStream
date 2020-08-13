@@ -1,16 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import CreateUser from './components/CreateUser/CreateUser';
-import { BrowserRouter, Route } from "react-router-dom";
+//import Intro from './components/Intro/Intro';
+import NewUser from './components/NewUser/NewUser';
+import { HashRouter, Route } from 'react-router-dom';
 
 ReactDOM.render(
 	<React.StrictMode>
-		<BrowserRouter>
-			<div className="App">
-				<Route path="/" exact component={CreateUser} />
+		<HashRouter>
+			<div className="">
+				{/* <Route path="/newUser" exact component={NewUser} /> */}
+				<Route path="/" exact component={NewUser} />
 			</div>
-		</BrowserRouter>
+		</HashRouter>
 	</React.StrictMode>,
 	document.getElementById('root')
 );

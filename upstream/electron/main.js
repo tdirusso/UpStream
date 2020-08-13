@@ -1,8 +1,12 @@
 const electron = require('electron');
-const { app, BrowserWindow, screen } = electron;
+const { app, BrowserWindow, screen, ipcMain } = electron;
 const path = require('path');
 
 const isDev = true;
+
+const paths = {
+    newUser: '#/newUser'
+};
 
 let window;
 
@@ -17,7 +21,7 @@ app.on('ready', () => {
         }
     });
 
-    const startURL = isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`;
+    const startURL = isDev ? 'http://localhost:3000/' : `file://${path.join(__dirname, '../build/index.html')}`;
 
     window.loadURL(startURL);
 
@@ -26,4 +30,11 @@ app.on('ready', () => {
     window.on('closed', () => {
         app.quit();
     });
+});
+
+ipcMain.on('intro:done', () => {
+    setTimeout(() => {
+        window.webContents.executeJavaScript(`location.assign('${paths.newUser}')`);
+        window.focus();
+    }, 3500);
 });

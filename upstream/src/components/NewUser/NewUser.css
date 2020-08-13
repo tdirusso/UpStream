@@ -1,0 +1,39 @@
+.inputs-container {
+    position: relative;
+    top: 5vh;
+    width: 50%;
+    margin: 0 auto;
+}
+
+.submit-basics {
+    text-align: center;
+}
+
+.submit-income {
+    float: right;
+}
+
+.basics .input-field,
+.income .input-field {
+    margin-top: 3em;
+    margin-bottom: 3em;
+}
+
+.basics-header,
+.income-header {
+    text-align: center;
+    margin: 0;
+}
+
+.income-description {
+    text-align: center;
+}
+
+.income {
+    display: none;
+    opacity: 0;
+}
+
+.show-income {
+    display: block;
+}
