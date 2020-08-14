@@ -5,35 +5,71 @@
     margin: 0 auto;
 }
 
-.submit-basics {
+.submit-basics-button {
     text-align: center;
 }
 
-.submit-income {
+.submit-income-button,
+.submit-categories-button {
     float: right;
 }
 
-.basics .input-field,
-.income .input-field {
+.back-to-basics-button,
+.back-to-income-button {
+    display: inline-block;
+}
+
+.basics .input-field, .income .input-field, .categories .input-field {
     margin-top: 3em;
     margin-bottom: 3em;
 }
 
-.basics-header,
-.income-header {
+.basics-header, .income-header, .categories-header {
     text-align: center;
     margin: 0;
 }
 
-.income-description {
+.income-description, .categories-description {
     text-align: center;
 }
 
-.income {
+.income, .categories {
     display: none;
     opacity: 0;
 }
 
-.show-income {
-    display: block;
+.categories .collection {
+    margin: 3em 0;
+    font-weight: 300;
+}
+
+.categories .collection-item {
+    padding: 20px 20px;
+}
+
+.categories .collection-item h6 {
+    display: inline;
+    flex-basis: 33%;
+}
+
+.categories .allocation {
+    margin: 0px;
+    flex-basis: 33%;
+    text-align: center;
+}
+
+.categories .delete-icon {
+    color: red;
+    float: right;
+
+}
+
+.categories-list {
+    display: flex;
+    align-items: center;
+}
+
+.categories .secondary-content {
+    flex-basis: 33%;
+    flex-grow: 1;
 }
