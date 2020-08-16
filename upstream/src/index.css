@@ -40,3 +40,12 @@ input.valid:not([type]), input.valid:not([type]):focus, input.valid[type=text]:n
 	display: block !important;
 	opacity: 1 !important;
 }
+
+.progress .determinate {
+	background-color: #00d0d0 !important;
+}
+
+.flex-break {
+	flex-basis: 100%;
+	height: 0;
+}

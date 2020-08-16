@@ -8,7 +8,7 @@ import { HashRouter, Route } from 'react-router-dom';
 ReactDOM.render(
 	<React.StrictMode>
 		<HashRouter>
-			<div className="">
+			<div className="main-container">
 				{/* <Route path="/newUser" exact component={NewUser} /> */}
 				<Route path="/" exact component={NewUser} />
 			</div>
