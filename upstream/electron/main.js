@@ -5,7 +5,7 @@ const path = require('path');
 const isDev = true;
 
 const paths = {
-    newUser: '#/newUser'
+    createUser: '#/createUser'
 };
 
 let window;
@@ -34,7 +34,7 @@ app.on('ready', () => {
 
 ipcMain.on('intro:done', () => {
     setTimeout(() => {
-        window.webContents.executeJavaScript(`location.assign('${paths.newUser}')`);
+        window.webContents.executeJavaScript(`location.assign('${paths.createUser}')`);
         window.focus();
     }, 3500);
 });

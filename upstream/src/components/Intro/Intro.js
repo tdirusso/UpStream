@@ -18,18 +18,16 @@ export default class Intro extends React.Component {
 
 			horizontalLine.addEventListener('transitionend', () => {
 				horizontalLine.classList.remove('show-arrow');
-				const verticalLine = this.verticalLine.current;
 
-				let sentDoneIPC = false;
-				verticalLine.addEventListener('transitionend', () => {
+				const introDone = () => {
+					verticalLine.removeEventListener('transitionend', introDone);
 					verticalLine.classList.add('show-arrow');
 					this.container.current.classList.add('animate__animated', 'animate__fadeOut', 'animate__delay-3s', 'animate__faster');
-					if (!sentDoneIPC) {
-						sentDoneIPC = true;
-						ipcRenderer.send('intro:done');
-					}
-				});
+					ipcRenderer.send('intro:done');
+				};
 
+				const verticalLine = this.verticalLine.current;
+				verticalLine.addEventListener('transitionend', introDone);
 				verticalLine.classList.add('grow');
 			});
 

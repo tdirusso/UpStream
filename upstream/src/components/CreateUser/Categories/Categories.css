@@ -1,0 +1,66 @@
+.categories .secondary-content {
+    flex-basis: 33%;
+    flex-grow: 1;
+}
+
+.categories .collection-item {
+    padding: 5px 20px;
+}
+
+.income-remaining-container {
+    display: flex;
+    align-items: center;
+    margin-top: 2em;
+}
+
+.income-remaining-container h5 {
+    margin: 0;
+}
+
+.income-remaining-container .progress {
+    margin: 0 20px;
+    height: 8px;
+}
+
+.income-remaining-container .determinate {
+    transition: width 250ms linear;
+    width: 0px;
+}
+
+.income-remaining {
+    text-align: center;
+    font-weight: 300;
+}
+
+.add-category-button {
+    text-align: center;
+    margin-bottom: 2em;
+}
+
+.custom-category-input {
+    margin-right: 30px !important;
+    flex-basis: 33%;
+}
+
+.categories .collection-item h6 {
+    display: inline;
+    flex-basis: 33%;
+    margin-right: 30px;
+}
+
+.categories .allocation {
+    margin: 0px;
+    flex-basis: 33%;
+    text-align: center;
+}
+
+.categories .delete-icon {
+    color: #ff5555;
+    float: right;
+    cursor: pointer;
+}
+
+.categories-list {
+    display: flex;
+    align-items: center;
+}
