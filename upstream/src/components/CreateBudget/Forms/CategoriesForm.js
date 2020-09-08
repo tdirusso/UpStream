@@ -24,7 +24,7 @@ export default class CategoriesForm extends React.Component {
     updateProgress() {
         const income = this.props.state.income;
 
-        const incomeSpent = Array.from(document.getElementsByClassName('allocation')).reduce((total, currentField) => {
+        const incomeAllocated = Array.from(document.getElementsByClassName('allocation')).reduce((total, currentField) => {
             let amount = currentField.value;
             if (amount) {
                 amount = parseFloat(amount).toFixed(2);
@@ -35,7 +35,7 @@ export default class CategoriesForm extends React.Component {
             }
         }, 0).toFixed(2);
 
-        const incomeRemaining = parseFloat(income - incomeSpent);
+        const incomeRemaining = parseFloat(income - incomeAllocated);
 
         if (incomeRemaining < 0) {
             this.props.setState({ overBudget: true });
@@ -44,12 +44,12 @@ export default class CategoriesForm extends React.Component {
         }
 
         this.props.setState({
-            incomeSpent: incomeSpent,
+            incomeAllocated: incomeAllocated,
             incomeRemaining: incomeRemaining.toFixed(2)
         });
 
         const progressBar = this.progress.current;
-        const progress = (incomeSpent / income * 100).toFixed(0);
+        const progress = (incomeAllocated / income * 100).toFixed(0);
 
         progressBar.style.width = `${progress}%`;
     }
@@ -90,7 +90,7 @@ export default class CategoriesForm extends React.Component {
 						These will be used as baselines and can be edited later
 					</h5>
                 <div className="income-remaining-container">
-                    <h5>$&nbsp;{this.props.state.incomeSpent ? this.props.state.incomeSpent.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0.00'}</h5>
+                    <h5>$&nbsp;{this.props.state.incomeAllocated ? this.props.state.incomeAllocated.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0.00'}</h5>
                     <div className="progress">
                         <div className="determinate" ref={this.progress}></div>
                     </div>

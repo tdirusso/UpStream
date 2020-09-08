@@ -5,24 +5,20 @@
     margin: 0 auto;
 }
 
-.submit-basics-button {
-    text-align: center;
-}
-
 .submit-income-button, .submit-categories-button {
     float: right;
 }
 
-.back-to-basics-button, .back-to-income-button {
+.back-to-income-button {
     display: inline-block;
 }
 
-.basics .input-field, .income .input-field, .categories .input-field {
+.income .input-field, .categories .input-field {
     margin-top: 3em;
     margin-bottom: 3em;
 }
 
-.basics-header, .income-header, .categories-header {
+.income-header, .categories-header {
     text-align: center;
     margin: 0;
 }
@@ -35,7 +31,7 @@
     padding-bottom: 50px;
 }
 
-.income, .categories {
+.categories {
     display: none;
     opacity: 0;
 }
