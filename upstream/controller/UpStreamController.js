@@ -13,13 +13,14 @@ class UpStreamController {
         };
 
         this.views = {
-            createBudget: '#/createBudget'
+            createBudget: '#/createBudget',
+            dashboard: '#/dashboard'
         };
 
         if (!fs.existsSync(this.paths.home)) fs.mkdirSync(this.paths.home);
         if (!fs.existsSync(this.paths.budget)) fs.writeFileSync(this.paths.budget, JSON.stringify({}));
 
-        this.budget = this.getBudget();
+        this.budget = JSON.parse(fs.readFileSync(this.paths.budget, 'utf-8'));
     }
 
     start({ startURL, width, height, preferences }) {
@@ -47,12 +48,13 @@ class UpStreamController {
         this.window.focus();
     }
 
-    createBudget(budgetData) {
-        console.log(budgetData);
-    }
-
-    getBudget() {
-        
+    createBudget(budget) {
+        if (!budget.incomeRemaining) budget.incomeRemaining = budget.income;
+        if (!budget.incomeSpent) budget.incomeSpent = '0.00';
+        budget.created = new Date();
+        budget.entries = {};
+        fs.writeFileSync(this.paths.budget, JSON.stringify(budget));
+        this.budget = budget;
     }
 };
 

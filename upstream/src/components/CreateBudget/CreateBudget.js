@@ -90,13 +90,18 @@ export default class CreatBudget extends React.Component {
 		});
 
 		this.setState({ categories }, () => {
-			ipcRenderer.send('budget:create', {
-				income: this.state.income,
-				incomeRemaining: this.state.incomeRemaining,
-				incomeAllocated: this.state.incomeAllocated,
-				overBudget: this.state.overBudget,
-				categories: this.state.categories
+			this.categoriesContainer.addEventListener('animationend', () => {
+				this.categoriesContainer.classList.remove('show');
+				this.categoriesContainer.classList.add('hidden');
+				ipcRenderer.send('budget:create', {
+					income: this.state.income,
+					incomeRemaining: this.state.incomeRemaining,
+					incomeAllocated: this.state.incomeAllocated,
+					overBudget: this.state.overBudget,
+					categories: this.state.categories
+				});
 			});
+			this.categoriesContainer.classList.add('animate__fadeOut');
 		});
 	}
 

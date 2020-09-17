@@ -20,8 +20,9 @@ app.on('ready', () => {
 
 ipcMain.on('intro:done', () => {
     setTimeout(() => {
-        if (USController.users.length > 0) {
-            //pick user
+        const budgetExists = Object.keys(USController.budget).length > 0;
+        if (budgetExists) {
+            USController.showView(USController.views.dashboard);
         } else {
             USController.showView(USController.views.createBudget);
         }
@@ -30,4 +31,7 @@ ipcMain.on('intro:done', () => {
 
 ipcMain.on('budget:create', (_, budgetData) => {
     USController.createBudget(budgetData);
+    USController.showView(USController.views.dashboard);
 });
+
+ipcMain.handle('budget:get', () => USController.budget);

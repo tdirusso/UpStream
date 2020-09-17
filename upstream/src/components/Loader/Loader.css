@@ -1,0 +1,10 @@
+.loader {
+    width: 50%;
+    position: relative;
+    top: 40vh;
+    margin: 0 auto;
+}
+
+.loader .progress {
+    height: 10px;
+}

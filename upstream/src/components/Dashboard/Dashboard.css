@@ -1,0 +1,99 @@
+.main {
+    background: #f2f2f2;
+    height: 100vh;
+    width: 100%;
+}
+
+.main-content {
+    margin-left: 200px;
+    padding: 10px;
+    height: 100%;
+}
+
+.side-navigation {
+    width: 200px;
+    position: fixed;
+    background: #2b363d;
+    height: 100vh;
+}
+
+.nav-title {
+    color: white;
+    font-size: 38px;
+    text-align: center;
+    overflow-wrap: break-word;
+    margin-top: 20px;
+}
+
+.nav-list {
+    color: white;
+    text-align: center;
+    list-style: none;
+    padding: 0;
+    margin-top: 15vh;
+    font-size: 20px;
+    font-weight: 200;
+}
+
+.nav-button {
+    margin: 20px 10px;
+    cursor: pointer;
+    transition: color 250ms ease-out;
+}
+
+.nav-button.active {
+    color: #00d0d0;
+}
+
+.nav-button:hover {
+    color: #00d0d0;
+}
+
+.dash-row {
+    display: flex;
+    justify-content: center;
+}
+
+.dash-container {
+    padding: 10px;
+}
+
+.status-container, .chart-container {
+    background-color: white;
+    border: 1px solid #cecece;
+    margin: 10px;
+    border-radius: 10px;
+    min-height: 200px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.chart-container {
+    flex-basis: 50%;
+}
+
+.status-container {
+    flex-basis: 50%;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+
+.section-title {
+    text-align: center;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+table.status {
+    font-size: 18px;
+    font-weight: 300;
+}
+
+table.status td {
+    padding: 20px 5px;
+}
+
+.no-border-bottom {
+    border-bottom: none;
+}
