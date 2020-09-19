@@ -7,16 +7,29 @@ const { ipcRenderer } = window.require('electron');
 const chartPalette = ['#f76c82', '#61ddbc', '#fbd277', '#74b0f4', '#b3a4ee', '#b4df80', '#d94452', '#36ba9b', '#f5b946', '#9479da', '#d56fab', '#424852'];
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-class BudgetTable extends React.Component {
+class Navigation extends React.Component {
     render() {
         return (
-            <div>Table</div>
+            <div className="side-navigation">
+                <h1 className="nav-title"><span className="up-span">Up</span><span className="stream-span">Stream</span></h1>
+                <ul className="nav-list">
+                    <li className="nav-button active">Dashboard</li>
+                    <li className="nav-button">Categories</li>
+                    <li className="nav-button">Reports</li>
+                    <li className="nav-button">Settings</li>
+                </ul>
+            </div>
         );
     }
 }
 
-
-
+class Actions extends React.Component {
+    render() {
+        return (
+            <div>Import / Add Item / Change Month</div>
+        );
+    }
+}
 
 class CategoryChart extends React.Component {
     constructor(props) {
@@ -94,17 +107,17 @@ class BudgetStatus extends React.Component {
                 <table className="centered status">
                     <tbody>
                         <tr className="no-border-bottom">
-                            <td><b>Total</b></td>
-                            <td>$ {this.props.total}</td>
+                            <td className="align-left"><b>Total</b></td>
+                            <td className="align-right">$ {this.props.total}</td>
                         </tr>
                         <tr>
-                            <td><b>Spent</b></td>
-                            <td>&ndash; $ {this.props.spent}</td>
+                            <td className="align-left"><b>Spent</b></td>
+                            <td className="align-right">&ndash; $ {this.props.spent}</td>
                         </tr>
-                        <tr className="no-border-bottom">
-                            <td><b>Remaining</b></td>
-                            <td style={{ color: this.state.remainingColor }}>
-                                {this.props.remaining < 0 ? '–' : null} $ {this.state.remainingValue} 
+                        <tr>
+                            <td className="align-left"><b>Remaining</b></td>
+                            <td className="align-right" style={{ color: this.state.remainingColor }}>
+                                {this.props.remaining < 0 ? '–' : null} $ {this.state.remainingValue}
                             </td>
                         </tr>
                     </tbody>
@@ -114,25 +127,69 @@ class BudgetStatus extends React.Component {
     }
 }
 
-class Actions extends React.Component {
-    render() {
-        return (
-            <div>Import / Add Item / Change Month</div>
-        );
-    }
-}
+class BudgetTable extends React.Component {
+    constructor(props) {
+        super();
 
-class Navigation extends React.Component {
+        const categoriesData = props.categories.map(category => {
+            const spent = props.entries.reduce((previous, current) => {
+                if (current.category === category.name) {
+                    return previous + parseFloat(current.amount)
+                }
+                return previous;
+            }, 0).toFixed(2);
+
+            const remaining = (parseFloat(category.allocation) - parseFloat(spent)).toFixed(2);
+            const percentage = ((parseFloat(spent) / parseFloat(category.allocation)) * 100).toFixed(2)
+
+            return {
+                name: category.name,
+                allocation: category.allocation,
+                spent: spent,
+                remaining: remaining,
+                percentage: percentage,
+                statusColor: remaining < 0 ? '#ff5555' : '#00d0d0'
+            };
+        });
+
+        this.state = { categoriesData };
+    }
+
     render() {
         return (
-            <div className="side-navigation">
-                <h1 className="nav-title"><span className="up-span">Up</span><span className="stream-span">Stream</span></h1>
-                <ul className="nav-list">
-                    <li className="nav-button active">Dashboard</li>
-                    <li className="nav-button">Reports</li>
-                    <li className="nav-button">Categories</li>
-                    <li className="nav-button">Settings</li>
-                </ul>
+            <div className="table-container dash-container">
+                <h5 className="section-title">Expense Table</h5>
+                <table className="centered expenses">
+                    <tbody>
+                        <tr>
+                            <td style={{ width: '25%' }}><b>Category</b></td>
+                            <td><b>Budget</b></td>
+                            <td><b>Spent</b></td>
+                            <td><b>Remaining</b></td>
+                            <td style={{ width: '33%' }}><b>% of Budget</b></td>
+                        </tr>
+                        {
+                            this.state.categoriesData.map(categoryData => {
+                                return (
+                                    <tr key={categoryData.name}>
+                                        <td>{categoryData.name}</td>
+                                        <td>{categoryData.allocation}</td>
+                                        <td>$ {categoryData.spent}</td>
+                                        <td style={{ color: categoryData.statusColor }}>
+                                            {categoryData.remaining < 0 ? '–' : null} $ {Math.abs(categoryData.remaining).toFixed(2)}
+                                        </td>
+                                        <td className="table-progress" style={{ color: categoryData.statusColor }}>
+                                            <div className="progress">
+                                                <div className={`determinate ${categoryData.remaining < 0 ? 'overBudget' : ''}`} style={{ width: categoryData.percentage + '%' }}></div>
+                                            </div>
+                                            <span className="table-percentage">{categoryData.percentage} %</span>
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        }
+                    </tbody>
+                </table>
             </div>
         );
     }
@@ -149,7 +206,9 @@ class Main extends React.Component {
         const spent = entries.reduce((previous, current) => (previous + parseFloat(current.amount)), 0).toFixed(2);
         const remaining = (parseFloat(total) - parseFloat(spent)).toFixed(2);
 
-        this.state = { entries, entryKey, total, spent, remaining };
+        const categories = props.budget.categories;
+
+        this.state = { entries, entryKey, total, spent, remaining, categories };
     }
 
     render() {
@@ -160,6 +219,9 @@ class Main extends React.Component {
                     <div className="dash-row">
                         <BudgetStatus total={this.state.total} spent={this.state.spent} remaining={this.state.remaining} />
                         <CategoryChart entries={this.state.entries} />
+                    </div>
+                    <div className="dash-row">
+                        <BudgetTable categories={this.state.categories} entries={this.state.entries} />
                     </div>
                 </div>
             </div>

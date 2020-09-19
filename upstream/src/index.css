@@ -56,3 +56,15 @@ input.valid:not([type]), input.valid:not([type]):focus, input.valid[type=text]:n
 canvas {
 	margin: 0 auto;
 }
+
+tr:last-child {
+	border-bottom: none;
+}
+
+.align-right {
+	text-align: right !important;
+}
+
+.align-left {
+	text-align: left !important;
+}
