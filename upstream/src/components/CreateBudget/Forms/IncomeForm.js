@@ -1,5 +1,6 @@
 import React from 'react';
 import './Forms.css';
+import { checkE } from '../../../utils/budget-utils';
 
 export default class IncomeForm extends React.Component {
 
@@ -12,6 +13,7 @@ export default class IncomeForm extends React.Component {
     }
 
     componentDidMount() {
+        this.income.current.focus();
         this.incomeContainer.current.addEventListener('animationend', () => {
             this.incomeContainer.current.classList.remove('animate__fadeIn', 'animate__fadeOut');
         });
@@ -22,18 +24,14 @@ export default class IncomeForm extends React.Component {
 
         if (!isNaN(incomeValue)) {
             let incomeValueParsed = parseFloat(incomeValue).toFixed(2);
-            event.target.nextElementSibling.innerHTML = `$ ${incomeValueParsed.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+            event.target.nextElementSibling.innerHTML = incomeValueParsed.toDollarString();
             this.props.setState({ income: incomeValue });
         } else {
             event.target.nextElementSibling.innerHTML = '$ 0.00';
             this.props.setState({ income: '' });
         }
     }
-
-    checkE(event) {
-        if (event.keyCode === 69) event.preventDefault();
-    }
-
+    
     validateIncome(event) {
         event.preventDefault();
 
@@ -55,7 +53,7 @@ export default class IncomeForm extends React.Component {
                 <h5 className="income-description">This will be used as a baseline and can be edited later</h5>
                 <form>
                     <div className="input-field">
-                        <input id="income" type="number" className="validate" required min="0.01" max={Number.MAX_SAFE_INTEGER} step="0.01" ref={this.income} placeholder="$ 0.00" onChange={this.updateIncome} onKeyDown={event => this.checkE(event)} value={this.props.state.income}></input>
+                        <input id="income" type="number" className="validate" required min="0.01" max={Number.MAX_SAFE_INTEGER} step="0.01" ref={this.income} placeholder="$ 0.00" onChange={this.updateIncome} onKeyDown={event => checkE(event)} value={this.props.state.income}></input>
                         <label htmlFor="income">$ 0.00</label>
                         <span className="helper-text" data-error="Please enter a valid monthly income" data-success=""></span>
                     </div>

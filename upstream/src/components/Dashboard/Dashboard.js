@@ -2,10 +2,9 @@ import React from 'react';
 import Loader from '../Loader/Loader';
 import './Dashboard.css';
 import Chart from 'chart.js';
-const { ipcRenderer } = window.require('electron');
+import { months, colors } from '../../constants/constants';
 
-const chartPalette = ['#f76c82', '#61ddbc', '#fbd277', '#74b0f4', '#b3a4ee', '#b4df80', '#d94452', '#36ba9b', '#f5b946', '#9479da', '#d56fab', '#424852'];
-const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const { ipcRenderer } = window.require('electron');
 
 class Navigation extends React.Component {
     render() {
@@ -56,7 +55,7 @@ class CategoryChart extends React.Component {
             data: {
                 datasets: [{
                     data: Object.keys(this.state.spendingMap).map(key => this.state.spendingMap[key]),
-                    backgroundColor: chartPalette.slice(0, Object.keys(this.state.spendingMap).length),
+                    backgroundColor: colors.pieChart.slice(0, Object.keys(this.state.spendingMap).length),
                     borderWidth: 1
                 }],
                 labels: Object.keys(this.state.spendingMap)
@@ -94,7 +93,7 @@ class CategoryChart extends React.Component {
 class BudgetStatus extends React.Component {
     constructor(props) {
         super();
-        const remainingColor = props.remaining < 0 ? '#ff5555' : '#00d0d0';
+        const remainingColor = props.remaining < 0 ? colors.overBudget : colors.underBudget;
         const remainingValue = props.remaining < 0 ? Math.abs(props.remaining) : props.remaining;
 
         this.state = { remainingColor, remainingValue }
@@ -117,7 +116,13 @@ class BudgetStatus extends React.Component {
                         <tr>
                             <td className="align-left"><b>Remaining</b></td>
                             <td className="align-right" style={{ color: this.state.remainingColor }}>
-                                {this.props.remaining < 0 ? '–' : null} $ {this.state.remainingValue}
+                                {
+                                    this.props.remaining < 0 ? '–' : null
+                                }
+                                $
+                                {
+                                    this.state.remainingValue
+                                }
                             </td>
                         </tr>
                     </tbody>
@@ -148,7 +153,7 @@ class BudgetTable extends React.Component {
                 spent: spent,
                 remaining: remaining,
                 percentage: percentage,
-                statusColor: remaining < 0 ? '#ff5555' : '#00d0d0'
+                statusColor: remaining < 0 ? colors.overBudget : colors.underBudget
             };
         });
 

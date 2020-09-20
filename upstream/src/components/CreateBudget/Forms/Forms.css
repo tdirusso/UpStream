@@ -41,3 +41,7 @@
     font-weight: 300;
     margin-bottom: 10px;
 }
+
+.income-remaining-container {
+    white-space: nowrap;
+}

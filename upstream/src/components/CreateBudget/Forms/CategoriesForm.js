@@ -1,6 +1,8 @@
 import React from 'react';
 import './Forms.css';
 import { CustomCategory, DefaultCategory } from '../Categories/Categories';
+import { checkE } from '../../../utils/budget-utils';
+import { colors } from '../../../constants/constants';
 
 export default class CategoriesForm extends React.Component {
 
@@ -55,18 +57,31 @@ export default class CategoriesForm extends React.Component {
     }
 
     removeDefaultCategory(event) {
-        this.props.setState({ defaultCategories: this.props.state.defaultCategories.filter(category => category !== event.target.getAttribute('category')) }, () => this.updateProgress());
+        this.props.setState({
+            defaultCategories: this.props.state.defaultCategories.filter(category => category !== event.target.getAttribute('category'))
+        }, () => this.updateProgress());
     }
 
     removeCustomCategory(event) {
         event.preventDefault();
-        this.props.setState({ customCategories: this.props.state.customCategories.filter(category => category.props.index !== event.target.getAttribute('index')) }, () => this.updateProgress());
+        this.props.setState({
+            customCategories: this.props.state.customCategories.filter(category => category.props.index !== event.target.getAttribute('index'))
+        }, () => this.updateProgress());
     }
 
     addCategory(event) {
         event.preventDefault();
         const currentCustomCategories = this.props.state.customCategories;
-        currentCustomCategories.push(<CustomCategory key={`custom-category-${currentCustomCategories.length}`} index={currentCustomCategories.length.toString()} handleInputChange={this.updateProgress} handleDelete={this.removeCustomCategory} checkE={event => this.checkE(event)} />);
+
+        currentCustomCategories.push(
+            <CustomCategory
+                key={`custom-category-${currentCustomCategories.length}`}
+                index={currentCustomCategories.length.toString()}
+                handleInputChange={this.updateProgress}
+                handleDelete={this.removeCustomCategory}
+                checkE={event => checkE(event)}
+            />
+        );
 
         this.props.setState({ customCategories: currentCustomCategories }, () => {
             const customInputs = document.getElementsByClassName('custom-category-input');
@@ -77,30 +92,51 @@ export default class CategoriesForm extends React.Component {
         });
     }
 
-    checkE(event) {
-        if (event.keyCode === 69) event.preventDefault();
-    }
-
     render() {
         return (
             <div className="inputs-container categories animate__animated animate__faster" ref={this.categoriesContainer}>
                 <h3 className="categories-header">Time to build the budget</h3>
                 <h5 className="categories-description">
                     Please select your initial budget categories, along with thier associated <b>monthly</b> allocations.
-						These will be used as baselines and can be edited later
-					</h5>
+					These will be used as baselines and can be edited later
+				</h5>
                 <div className="income-remaining-container">
-                    <h5>$&nbsp;{this.props.state.incomeAllocated ? this.props.state.incomeAllocated.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0.00'}</h5>
+                    <h5>
+                        {
+                            this.props.state.incomeAllocated ? this.props.state.incomeAllocated.toDollarString() : '0.00'
+                        }
+                    </h5>
                     <div className="progress">
                         <div className="determinate" ref={this.progress}></div>
                     </div>
-                    <h5>$&nbsp;{this.props.state.income.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</h5>
+                    <h5>
+                        {
+                            this.props.state.income.toDollarString()
+                        }
+                    </h5>
                 </div>
-                <h6 className="income-remaining" style={{ color: this.props.state.overBudget ? '#ff5555' : '#00d0d0' }}><b>$&nbsp;{this.props.state.incomeRemaining ? this.props.state.incomeRemaining.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : this.props.state.income.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</b> remaining</h6>
+                <h6 className="income-remaining" style={{ color: this.props.state.overBudget ? colors.overBudget : colors.underBudget }}>
+                    <b>
+                        {
+                            this.props.state.incomeRemaining ? this.props.state.incomeRemaining.toDollarString() : this.props.state.income.toDollarString()
+                        }
+                    </b> remaining
+                </h6>
                 <form>
                     <ul className="collection">
-                        {this.props.state.defaultCategories.map((category, index) => <DefaultCategory category={category} key={`default-category-${index}`} handleInputChange={this.updateProgress} handleDelete={this.removeDefaultCategory} checkE={event => this.checkE(event)} />)}
-                        {this.props.state.customCategories.map((category) => category)}
+                        {
+                            this.props.state.defaultCategories.map((category, index) =>
+                                <DefaultCategory
+                                    category={category}
+                                    key={`default-category-${index}`}
+                                    handleInputChange={this.updateProgress}
+                                    handleDelete={this.removeDefaultCategory}
+                                    checkE={event => checkE(event)}
+                                />)
+                        }
+                        {
+                            this.props.state.customCategories.map((category) => category)
+                        }
                     </ul>
                     <div className="add-category-button">
                         <a className="waves-effect waves-light btn" href="#0" onClick={this.addCategory}>New Category</a>

@@ -1,6 +1,8 @@
 import React from 'react';
 import IncomeForm from './Forms/IncomeForm';
 import CategoriesForm from './Forms/CategoriesForm';
+import { defaultCategories } from '../../constants/constants';
+
 const { ipcRenderer } = window.require('electron');
 
 export default class CreatBudget extends React.Component {
@@ -16,13 +18,7 @@ export default class CreatBudget extends React.Component {
 			incomeRemaining: '',
 			incomeAllocated: '',
 			overBudget: false,
-			defaultCategories: [
-				'Groceries',
-				'Transportation',
-				'Housing',
-				'Utilities',
-				'Savings'
-			],
+			defaultCategories: defaultCategories,
 			customCategories: []
 		};
 
@@ -79,6 +75,7 @@ export default class CreatBudget extends React.Component {
 		}
 
 		const categoryRows = document.querySelectorAll('.categories-list.collection-item');
+		
 		const categories = Array.from(categoryRows).map(categoryRow => {
 			const categoryNameElement = categoryRow.firstChild;
 			const isCustomCategory = categoryNameElement.className.includes('custom');
