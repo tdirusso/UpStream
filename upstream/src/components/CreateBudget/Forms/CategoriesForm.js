@@ -26,7 +26,8 @@ export default class CategoriesForm extends React.Component {
     updateProgress() {
         const income = this.props.state.income;
 
-        const incomeAllocated = Array.from(document.getElementsByClassName('allocation')).reduce((total, currentField) => {
+        const allocationInputs = Array.from(document.getElementsByClassName('allocation'));
+        const incomeAllocated = allocationInputs.reduce((total, currentField) => {
             let amount = currentField.value;
             if (amount) {
                 amount = parseFloat(amount).toFixed(2);
@@ -39,15 +40,10 @@ export default class CategoriesForm extends React.Component {
 
         const incomeRemaining = parseFloat(income - incomeAllocated);
 
-        if (incomeRemaining < 0) {
-            this.props.setState({ overBudget: true });
-        } else {
-            this.props.setState({ overBudget: false });
-        }
-
         this.props.setState({
             incomeAllocated: incomeAllocated,
-            incomeRemaining: incomeRemaining.toFixed(2)
+            incomeRemaining: incomeRemaining.toFixed(2),
+            overBudget: incomeRemaining < 0
         });
 
         const progressBar = this.progress.current;
@@ -57,15 +53,17 @@ export default class CategoriesForm extends React.Component {
     }
 
     removeDefaultCategory(event) {
+        const defaultCategories = this.props.state.defaultCategories;
         this.props.setState({
-            defaultCategories: this.props.state.defaultCategories.filter(category => category !== event.target.getAttribute('category'))
+            defaultCategories: defaultCategories.filter(category => category !== event.target.getAttribute('category'))
         }, () => this.updateProgress());
     }
 
     removeCustomCategory(event) {
         event.preventDefault();
+        const customCategories = this.props.state.customCategories;
         this.props.setState({
-            customCategories: this.props.state.customCategories.filter(category => category.props.index !== event.target.getAttribute('index'))
+            customCategories: customCategories.filter(category => category.props.index !== event.target.getAttribute('index'))
         }, () => this.updateProgress());
     }
 
@@ -132,7 +130,8 @@ export default class CategoriesForm extends React.Component {
                                     handleInputChange={this.updateProgress}
                                     handleDelete={this.removeDefaultCategory}
                                     checkE={event => checkE(event)}
-                                />)
+                                />
+                            )
                         }
                         {
                             this.props.state.customCategories.map((category) => category)

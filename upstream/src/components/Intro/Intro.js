@@ -13,25 +13,27 @@ export default class Intro extends React.Component {
 	}
 
 	componentDidMount() {
-		this.animatedTitle.current.addEventListener('animationend', () => {
-			const horizontalLine = this.horizontalLine.current;
+		const container = this.container.current;
+		const title = this.animatedTitle.current;
+		const horizLine = this.horizontalLine.current;
+		const vertLine = this.verticalLine.current;
 
-			horizontalLine.addEventListener('transitionend', () => {
-				horizontalLine.classList.remove('show-arrow');
+		title.addEventListener('animationend', () => {
+			horizLine.addEventListener('transitionend', () => {
+				horizLine.classList.remove('show-arrow');
 
 				const introDone = () => {
-					verticalLine.removeEventListener('transitionend', introDone);
-					verticalLine.classList.add('show-arrow');
-					this.container.current.classList.add('animate__animated', 'animate__fadeOut', 'animate__delay-3s', 'animate__faster');
+					vertLine.removeEventListener('transitionend', introDone);
+					vertLine.classList.add('show-arrow');
+					container.classList.add('animate__animated', 'animate__fadeOut', 'animate__delay-3s', 'animate__faster');
 					ipcRenderer.send('intro:done');
 				};
 
-				const verticalLine = this.verticalLine.current;
-				verticalLine.addEventListener('transitionend', introDone);
-				verticalLine.classList.add('grow');
+				vertLine.addEventListener('transitionend', introDone);
+				vertLine.classList.add('grow');
 			});
 
-			horizontalLine.classList.add('grow');
+			horizLine.classList.add('grow');
 		});
 	}
 

@@ -31,7 +31,7 @@ export default class IncomeForm extends React.Component {
             this.props.setState({ income: '' });
         }
     }
-    
+
     validateIncome(event) {
         event.preventDefault();
 
@@ -53,7 +53,20 @@ export default class IncomeForm extends React.Component {
                 <h5 className="income-description">This will be used as a baseline and can be edited later</h5>
                 <form>
                     <div className="input-field">
-                        <input id="income" type="number" className="validate" required min="0.01" max={Number.MAX_SAFE_INTEGER} step="0.01" ref={this.income} placeholder="$ 0.00" onChange={this.updateIncome} onKeyDown={event => checkE(event)} value={this.props.state.income}></input>
+                        <input
+                            id="income"
+                            type="number"
+                            className="validate"
+                            required
+                            min="0.01"
+                            max={Number.MAX_SAFE_INTEGER}
+                            step="0.01"
+                            ref={this.income}
+                            placeholder="$ 0.00"
+                            onChange={this.updateIncome}
+                            onKeyDown={event => checkE(event)}
+                            value={this.props.state.income}>
+                        </input>
                         <label htmlFor="income">$ 0.00</label>
                         <span className="helper-text" data-error="Please enter a valid monthly income" data-success=""></span>
                     </div>

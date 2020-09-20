@@ -10,7 +10,10 @@ class Navigation extends React.Component {
     render() {
         return (
             <div className="side-navigation">
-                <h1 className="nav-title"><span className="up-span">Up</span><span className="stream-span">Stream</span></h1>
+                <h1 className="nav-title">
+                    <span className="up-span">Up</span>
+                    <span className="stream-span">Stream</span>
+                </h1>
                 <ul className="nav-list">
                     <li className="nav-button active">Dashboard</li>
                     <li className="nav-button">Categories</li>
@@ -203,6 +206,7 @@ class BudgetTable extends React.Component {
 class Main extends React.Component {
     constructor(props) {
         super();
+
         const now = new Date();
         const entryKey = `${months[now.getMonth()].toLowerCase()}-${now.getFullYear()}`;
         const entries = props.budget.entries[entryKey];
@@ -213,7 +217,7 @@ class Main extends React.Component {
 
         const categories = props.budget.categories;
 
-        this.state = { entries, entryKey, total, spent, remaining, categories };
+        this.state = { entries, total, spent, remaining, categories };
     }
 
     render() {

@@ -65,7 +65,8 @@ export default class CreatBudget extends React.Component {
 	submit(event) {
 		event.preventDefault();
 
-		document.querySelectorAll('.allocation').forEach(allocation => { if (!allocation.value) allocation.value = '0.00' });
+		const allocationInputs = document.querySelectorAll('.allocation');
+		allocationInputs.forEach(allocation => { if (!allocation.value) allocation.value = '0.00' });
 
 		const invalidInput = document.querySelector('.invalid');
 
@@ -75,7 +76,7 @@ export default class CreatBudget extends React.Component {
 		}
 
 		const categoryRows = document.querySelectorAll('.categories-list.collection-item');
-		
+
 		const categories = Array.from(categoryRows).map(categoryRow => {
 			const categoryNameElement = categoryRow.firstChild;
 			const isCustomCategory = categoryNameElement.className.includes('custom');
@@ -87,9 +88,11 @@ export default class CreatBudget extends React.Component {
 		});
 
 		this.setState({ categories }, () => {
-			this.categoriesContainer.addEventListener('animationend', () => {
-				this.categoriesContainer.classList.remove('show');
-				this.categoriesContainer.classList.add('hidden');
+			const categoriesContainer = this.categoriesContainer;
+			categoriesContainer.addEventListener('animationend', () => {
+				categoriesContainer.classList.remove('show');
+				categoriesContainer.classList.add('hidden');
+
 				ipcRenderer.send('budget:create', {
 					income: this.state.income,
 					incomeRemaining: this.state.incomeRemaining,
@@ -98,15 +101,28 @@ export default class CreatBudget extends React.Component {
 					categories: this.state.categories
 				});
 			});
-			this.categoriesContainer.classList.add('animate__fadeOut');
+
+			categoriesContainer.classList.add('animate__fadeOut');
 		});
 	}
 
 	render() {
 		return (
 			<div>
-				<IncomeForm ref={this.incomeForm} state={this.state} setState={this.setState} next={this.showCategoriesForm} />
-				<CategoriesForm ref={this.categoriesForm} state={this.state} setState={this.setState} back={this.backToIncomeForm} submit={this.submit} />
+				<IncomeForm
+					ref={this.incomeForm}
+					state={this.state}
+					setState={this.setState}
+					next={this.showCategoriesForm}
+				/>
+
+				<CategoriesForm
+					ref={this.categoriesForm}
+					state={this.state}
+					setState={this.setState}
+					back={this.backToIncomeForm}
+					submit={this.submit}
+				/>
 			</div>
 		);
 	}
