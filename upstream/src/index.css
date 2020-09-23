@@ -68,3 +68,11 @@ tr:last-child {
 .align-left {
 	text-align: left !important;
 }
+
+.datepicker-date-display, .datepicker-table td.is-selected {
+	background-color: #00d0d0;
+}
+
+.datepicker-cancel, .datepicker-clear, .datepicker-today, .datepicker-done, .dropdown-content li>a, .dropdown-content li>span {
+	color: #00d0d0;
+}

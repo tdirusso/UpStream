@@ -11,45 +11,6 @@
     padding-top: 25px;
 }
 
-.side-navigation {
-    width: 200px;
-    position: fixed;
-    background: #2b363d;
-    height: 100vh;
-}
-
-.nav-title {
-    color: white;
-    font-size: 38px;
-    text-align: center;
-    overflow-wrap: break-word;
-    margin-top: 20px;
-}
-
-.nav-list {
-    color: white;
-    text-align: center;
-    list-style: none;
-    padding: 0;
-    margin-top: 15vh;
-    font-size: 20px;
-    font-weight: 200;
-}
-
-.nav-button {
-    margin: 20px 10px;
-    cursor: pointer;
-    transition: color 250ms ease-out;
-}
-
-.nav-button.active {
-    color: #00d0d0;
-}
-
-.nav-button:hover {
-    color: #00d0d0;
-}
-
 .dash-row {
     display: flex;
     justify-content: center;
@@ -126,4 +87,23 @@ table.status td {
 
 .progress .overBudget {
     background-color: #ff5555 !important;
+}
+
+.dashboard.datepicker {
+    text-align: center !important;
+    font-size: 28px !important;
+    cursor: pointer !important;
+    font-weight: 200 !important;
+    border-bottom: none !important;
+}
+
+.date-header {
+    display: flex;
+}
+
+.date-header i {
+    position: relative;
+    top: 10px;
+    margin: 0 5px;
+    cursor: pointer;
 }

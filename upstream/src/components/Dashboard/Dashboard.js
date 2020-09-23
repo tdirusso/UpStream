@@ -2,54 +2,50 @@ import React from 'react';
 import Loader from '../Loader/Loader';
 import './Dashboard.css';
 import Chart from 'chart.js';
+import Navigation from '../Navigation/Navigation';
 import { months, colors } from '../../constants/constants';
+import { calcSpent, calcCategoryExpenses, calcSpendingMap } from '../../utils/budget-utils';
 
 const { ipcRenderer } = window.require('electron');
 
-class Navigation extends React.Component {
-    render() {
-        return (
-            <div className="side-navigation">
-                <h1 className="nav-title">
-                    <span className="up-span">Up</span>
-                    <span className="stream-span">Stream</span>
-                </h1>
-                <ul className="nav-list">
-                    <li className="nav-button active">Dashboard</li>
-                    <li className="nav-button">Categories</li>
-                    <li className="nav-button">Reports</li>
-                    <li className="nav-button">Settings</li>
-                </ul>
-            </div>
-        );
+class DateHeader extends React.Component {
+    constructor() {
+        super();
+        this.monthPicker = React.createRef();
     }
-}
 
-class Actions extends React.Component {
+    componentDidMount() {
+        const picker = this.monthPicker.current;
+        const month = this.props.month;
+        const year = this.props.year;
+        const defaultDate = new Date(month + ' ' + year);
+
+        window.M.Datepicker.init(picker, {
+            defaultDate: defaultDate,
+            setDefaultDate: true,
+            format: 'mmmm yyyy',
+            onClose: () => {
+                const date = this.monthPicker.current.value
+                this.props.changeDate(date);
+            }
+        });
+    }
+
     render() {
         return (
-            <div>Import / Add Item / Change Month</div>
-        );
+            <div className="date-header">
+                <i className="material-icons">arrow_back</i>
+                <input type="text" className="datepicker dashboard" ref={this.monthPicker}></input>
+                <i className="material-icons">arrow_forward</i>
+            </div>
+        )
     }
 }
 
 class CategoryChart extends React.Component {
-    constructor(props) {
+    constructor() {
         super();
         this.chart = React.createRef();
-
-        const spendingMap = {};
-
-        props.entries.forEach(entry => {
-            const spent = spendingMap[entry.category];
-            if (!spent) {
-                spendingMap[entry.category] = entry.amount;
-            } else {
-                spendingMap[entry.category] = (parseFloat(entry.amount) + parseFloat(spent)).toFixed(2)
-            }
-        });
-
-        this.state = { spendingMap };
     }
 
     createChart() {
@@ -57,11 +53,11 @@ class CategoryChart extends React.Component {
             type: 'pie',
             data: {
                 datasets: [{
-                    data: Object.keys(this.state.spendingMap).map(key => this.state.spendingMap[key]),
-                    backgroundColor: colors.pieChart.slice(0, Object.keys(this.state.spendingMap).length),
+                    data: Object.keys(this.props.spendingMap).map(key => this.props.spendingMap[key]),
+                    backgroundColor: colors.pieChart.slice(0, Object.keys(this.props.spendingMap).length),
                     borderWidth: 1
                 }],
-                labels: Object.keys(this.state.spendingMap)
+                labels: Object.keys(this.props.spendingMap)
             },
             options: {
                 legend: {
@@ -94,14 +90,6 @@ class CategoryChart extends React.Component {
 }
 
 class BudgetStatus extends React.Component {
-    constructor(props) {
-        super();
-        const remainingColor = props.remaining < 0 ? colors.overBudget : colors.underBudget;
-        const remainingValue = props.remaining < 0 ? Math.abs(props.remaining) : props.remaining;
-
-        this.state = { remainingColor, remainingValue }
-    }
-
     render() {
         return (
             <div className="status-container dash-container">
@@ -118,13 +106,13 @@ class BudgetStatus extends React.Component {
                         </tr>
                         <tr>
                             <td className="align-left"><b>Remaining</b></td>
-                            <td className="align-right" style={{ color: this.state.remainingColor }}>
+                            <td className="align-right" style={{ color: this.props.remainingColor }}>
                                 {
-                                    this.props.remaining < 0 ? '–' : null
+                                    this.props.remainingValue < 0 ? '–' : null
                                 }
                                 $
                                 {
-                                    this.state.remainingValue
+                                    this.props.remainingText
                                 }
                             </td>
                         </tr>
@@ -136,33 +124,6 @@ class BudgetStatus extends React.Component {
 }
 
 class BudgetTable extends React.Component {
-    constructor(props) {
-        super();
-
-        const categoriesData = props.categories.map(category => {
-            const spent = props.entries.reduce((previous, current) => {
-                if (current.category === category.name) {
-                    return previous + parseFloat(current.amount)
-                }
-                return previous;
-            }, 0).toFixed(2);
-
-            const remaining = (parseFloat(category.allocation) - parseFloat(spent)).toFixed(2);
-            const percentage = ((parseFloat(spent) / parseFloat(category.allocation)) * 100).toFixed(2)
-
-            return {
-                name: category.name,
-                allocation: category.allocation,
-                spent: spent,
-                remaining: remaining,
-                percentage: percentage,
-                statusColor: remaining < 0 ? colors.overBudget : colors.underBudget
-            };
-        });
-
-        this.state = { categoriesData };
-    }
-
     render() {
         return (
             <div className="table-container dash-container">
@@ -177,20 +138,23 @@ class BudgetTable extends React.Component {
                             <td style={{ width: '33%' }}><b>% of Budget</b></td>
                         </tr>
                         {
-                            this.state.categoriesData.map(categoryData => {
+                            this.props.categoryExpenses.map(expenseData => {
                                 return (
-                                    <tr key={categoryData.name}>
-                                        <td>{categoryData.name}</td>
-                                        <td>{categoryData.allocation}</td>
-                                        <td>$ {categoryData.spent}</td>
-                                        <td style={{ color: categoryData.statusColor }}>
-                                            {categoryData.remaining < 0 ? '–' : null} $ {Math.abs(categoryData.remaining).toFixed(2)}
+                                    <tr key={expenseData.name}>
+                                        <td>{expenseData.name}</td>
+                                        <td>{expenseData.allocation}</td>
+                                        <td>$ {expenseData.spent}</td>
+                                        <td style={{ color: expenseData.statusColor }}>
+                                            {expenseData.remaining < 0 ? '–' : null} $ {Math.abs(expenseData.remaining).toFixed(2)}
                                         </td>
-                                        <td className="table-progress" style={{ color: categoryData.statusColor }}>
+                                        <td className="table-progress" style={{ color: expenseData.statusColor }}>
                                             <div className="progress">
-                                                <div className={`determinate ${categoryData.remaining < 0 ? 'overBudget' : ''}`} style={{ width: categoryData.percentage + '%' }}></div>
+                                                <div
+                                                    className={`determinate ${expenseData.remaining < 0 ? 'overBudget' : ''}`}
+                                                    style={{ width: expenseData.percentage + '%' }}>
+                                                </div>
                                             </div>
-                                            <span className="table-percentage">{categoryData.percentage} %</span>
+                                            <span className="table-percentage">{expenseData.percentage} %</span>
                                         </td>
                                     </tr>
                                 );
@@ -207,17 +171,57 @@ class Main extends React.Component {
     constructor(props) {
         super();
 
-        const now = new Date();
-        const entryKey = `${months[now.getMonth()].toLowerCase()}-${now.getFullYear()}`;
-        const entries = props.budget.entries[entryKey];
+        this.changeDate = this.changeDate.bind(this);
 
-        const total = props.budget.income;
-        const spent = entries.reduce((previous, current) => (previous + parseFloat(current.amount)), 0).toFixed(2);
+        const initialState = this.computeBudgetItems(new Date(), props);
+        this.state = initialState;
+    }
+
+    computeBudgetItems(date, props) {
+        let returnInitialState = false;
+
+        if (typeof this.props === 'undefined') {
+            returnInitialState = true;
+            this.props = props;
+        };
+
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+        const entryKey = `${month.toLowerCase()}-${year}`;
+        const entries = this.props.budget.entries[entryKey] || [];
+
+        const total = this.props.budget.income;
+        const spent = calcSpent(entries);
         const remaining = (parseFloat(total) - parseFloat(spent)).toFixed(2);
+        const remainingColor = remaining < 0 ? colors.overBudget : colors.underBudget;
+        const remainingText = remaining < 0 ? Math.abs(remaining) : remaining;
 
-        const categories = props.budget.categories;
+        const categories = this.props.budget.categories;
+        const categoryExpenses = calcCategoryExpenses(entries, categories);
 
-        this.state = { entries, total, spent, remaining, categories };
+        const spendingMap = calcSpendingMap(entries);
+
+        const stateObject = {
+            total,
+            spent,
+            remaining,
+            remainingColor,
+            remainingText,
+            categoryExpenses,
+            spendingMap,
+            month,
+            year
+        };
+
+        if (returnInitialState) {
+            return stateObject;
+        } else {
+            this.setState(stateObject);
+        }
+    }
+
+    changeDate(date) {
+        this.computeBudgetItems(new Date(date));
     }
 
     render() {
@@ -226,11 +230,14 @@ class Main extends React.Component {
                 <Navigation />
                 <div className="main-content">
                     <div className="dash-row">
-                        <BudgetStatus total={this.state.total} spent={this.state.spent} remaining={this.state.remaining} />
-                        <CategoryChart entries={this.state.entries} />
+                        <DateHeader month={this.state.month} year={this.state.year} changeDate={this.changeDate} />
                     </div>
                     <div className="dash-row">
-                        <BudgetTable categories={this.state.categories} entries={this.state.entries} />
+                        <BudgetStatus total={this.state.total} spent={this.state.spent} remainingValue={this.state.remaining} remainingText={this.state.remainingText} remainingColor={this.state.remainingColor} />
+                        <CategoryChart spendingMap={this.state.spendingMap} />
+                    </div>
+                    <div className="dash-row">
+                        <BudgetTable categoryExpenses={this.state.categoryExpenses} />
                     </div>
                 </div>
             </div>
