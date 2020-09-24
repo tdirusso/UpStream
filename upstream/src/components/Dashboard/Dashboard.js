@@ -97,8 +97,8 @@ class CategoryChart extends React.Component {
             instance.destroy();
         });
 
-        if (this.isSpendingData()) { 
-            this.createChart(); 
+        if (this.isSpendingData()) {
+            this.createChart();
         }
     }
 
@@ -118,82 +118,78 @@ class CategoryChart extends React.Component {
     }
 }
 
-class BudgetStatus extends React.Component {
-    render() {
-        return (
-            <div className="status-container dash-container">
-                <h5 className="section-title">Status</h5>
-                <table className="centered status">
-                    <tbody>
-                        <tr className="no-border-bottom">
-                            <td className="align-left"><b>Total</b></td>
-                            <td className="align-right">$ {this.props.total}</td>
-                        </tr>
-                        <tr>
-                            <td className="align-left"><b>Spent</b></td>
-                            <td className="align-right">&ndash; $ {this.props.spent}</td>
-                        </tr>
-                        <tr>
-                            <td className="align-left"><b>Remaining</b></td>
-                            <td className="align-right" style={{ color: this.props.remainingColor }}>
-                                {
-                                    this.props.remainingValue < 0 ? '–' : null
-                                }
+function BudgetStatus(props) {
+    return (
+        <div className="status-container dash-container">
+            <h5 className="section-title">Status</h5>
+            <table className="centered status">
+                <tbody>
+                    <tr className="no-border-bottom">
+                        <td className="align-left"><b>Total</b></td>
+                        <td className="align-right">$ {props.total}</td>
+                    </tr>
+                    <tr>
+                        <td className="align-left"><b>Spent</b></td>
+                        <td className="align-right">&ndash; $ {props.spent}</td>
+                    </tr>
+                    <tr>
+                        <td className="align-left"><b>Remaining</b></td>
+                        <td className="align-right" style={{ color: props.remainingColor }}>
+                            {
+                                props.remainingValue < 0 ? '–' : null
+                            }
                                 $
                                 {
-                                    this.props.remainingText
-                                }
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        );
-    }
+                                props.remainingText
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    );
 }
 
-class BudgetTable extends React.Component {
-    render() {
-        return (
-            <div className="table-container dash-container">
-                <h5 className="section-title">Expense Table</h5>
-                <table className="centered expenses">
-                    <tbody>
-                        <tr>
-                            <td style={{ width: '25%' }}><b>Category</b></td>
-                            <td><b>Budget</b></td>
-                            <td><b>Spent</b></td>
-                            <td><b>Remaining</b></td>
-                            <td style={{ width: '33%' }}><b>% of Budget</b></td>
-                        </tr>
-                        {
-                            this.props.categoryExpenses.map(expenseData => {
-                                return (
-                                    <tr key={expenseData.name}>
-                                        <td>{expenseData.name}</td>
-                                        <td>{expenseData.allocation}</td>
-                                        <td>$ {expenseData.spent}</td>
-                                        <td style={{ color: expenseData.statusColor }}>
-                                            {expenseData.remaining < 0 ? '–' : null} $ {Math.abs(expenseData.remaining).toFixed(2)}
-                                        </td>
-                                        <td className="table-progress" style={{ color: expenseData.statusColor }}>
-                                            <div className="progress">
-                                                <div
-                                                    className={`determinate ${expenseData.remaining < 0 ? 'overBudget' : ''}`}
-                                                    style={{ width: expenseData.percentage + '%' }}>
-                                                </div>
+function BudgetTable(props) {
+    return (
+        <div className="table-container dash-container">
+            <h5 className="section-title">Expense Table</h5>
+            <table className="centered expenses">
+                <tbody>
+                    <tr>
+                        <td style={{ width: '25%' }}><b>Category</b></td>
+                        <td><b>Budget</b></td>
+                        <td><b>Spent</b></td>
+                        <td><b>Remaining</b></td>
+                        <td style={{ width: '33%' }}><b>% of Budget</b></td>
+                    </tr>
+                    {
+                        props.categoryExpenses.map(expenseData => {
+                            return (
+                                <tr key={expenseData.name}>
+                                    <td>{expenseData.name}</td>
+                                    <td>{expenseData.allocation}</td>
+                                    <td>$ {expenseData.spent}</td>
+                                    <td style={{ color: expenseData.statusColor }}>
+                                        {expenseData.remaining < 0 ? '–' : null} $ {Math.abs(expenseData.remaining).toFixed(2)}
+                                    </td>
+                                    <td className="table-progress" style={{ color: expenseData.statusColor }}>
+                                        <div className="progress">
+                                            <div
+                                                className={`determinate ${expenseData.remaining < 0 ? 'overBudget' : ''}`}
+                                                style={{ width: expenseData.percentage + '%' }}>
                                             </div>
-                                            <span className="table-percentage">{expenseData.percentage} %</span>
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        }
-                    </tbody>
-                </table>
-            </div>
-        );
-    }
+                                        </div>
+                                        <span className="table-percentage">{expenseData.percentage} %</span>
+                                    </td>
+                                </tr>
+                            );
+                        })
+                    }
+                </tbody>
+            </table>
+        </div>
+    );
 }
 
 class Main extends React.Component {
@@ -204,7 +200,14 @@ class Main extends React.Component {
         this.prevMonth = this.prevMonth.bind(this);
         this.nextMonth = this.nextMonth.bind(this);
 
-        const initialState = this.computeBudgetItems(new Date(), props);
+        let initialDate = new Date();
+
+        const savedDate = sessionStorage.getItem('dashboard-date');
+        if (savedDate) {
+            initialDate = new Date(savedDate);
+        }
+
+        const initialState = this.computeBudgetItems(initialDate, props);
         this.state = initialState;
     }
 
@@ -244,6 +247,8 @@ class Main extends React.Component {
             year
         };
 
+        sessionStorage.setItem('dashboard-date', date);
+
         if (returnInitialState) {
             return stateObject;
         } else {
@@ -281,7 +286,6 @@ class Main extends React.Component {
     render() {
         return (
             <div className="main animate__animated animate__fadeIn animate__faster">
-                <Navigation />
                 <div className="main-content">
                     <div className="dash-row">
                         <DateHeader
@@ -322,20 +326,25 @@ export default class Dashboard extends React.Component {
     }
 
     componentDidMount() {
-        setTimeout(() => {
-            ipcRenderer.invoke('budget:get').then(budget => {
-                this.setState({
-                    loading: false,
-                    budget: budget
-                });
+        ipcRenderer.invoke('budget:get').then(budget => {
+            this.setState({
+                loading: false,
+                budget: budget
             });
-        }, 1000);
+        });
     }
 
     render() {
         return (
-            <div className="animate__animated animate__fadeIn animate__faster">
-                {this.state.loading ? <Loader /> : <Main budget={this.state.budget} />}
+            <div>
+                <Navigation />
+                {
+                    this.state.loading ?
+                        <div style={{ marginLeft: '200px' }}>
+                            <Loader />
+                        </div> :
+                        <Main budget={this.state.budget} />
+                }
             </div>
         );
     }

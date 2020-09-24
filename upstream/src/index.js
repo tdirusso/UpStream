@@ -4,6 +4,7 @@ import './index.css';
 import Intro from './components/Intro/Intro';
 import CreateBudget from './components/CreateBudget/CreateBudget';
 import Dashboard from './components/Dashboard/Dashboard';
+import Categories from './components/Categories/Categories';
 import { HashRouter, Route } from 'react-router-dom';
 
 ReactDOM.render(
@@ -13,6 +14,7 @@ ReactDOM.render(
 				<Route path="/" exact component={Intro} />
 				<Route path="/createBudget" exact component={CreateBudget} />
 				<Route path="/dashboard" exact component={Dashboard} />
+				<Route path="/categories" exact component={Categories} />
 			</div>
 		</HashRouter>
 	</React.StrictMode>,

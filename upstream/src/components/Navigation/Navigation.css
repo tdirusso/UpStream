@@ -3,6 +3,8 @@
     position: fixed;
     background: #2b363d;
     height: 100vh;
+    z-index: 1;
+    top: 0;
 }
 
 .nav-title {
