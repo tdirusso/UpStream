@@ -12,6 +12,9 @@ class DateHeader extends React.Component {
     constructor() {
         super();
         this.monthPicker = React.createRef();
+
+        this.prev = this.prev.bind(this);
+        this.next = this.next.bind(this);
     }
 
     componentDidMount() {
@@ -31,12 +34,22 @@ class DateHeader extends React.Component {
         });
     }
 
+    prev() {
+        const pickerInstance = window.M.Datepicker.getInstance(this.monthPicker.current);
+        this.props.prevMonth(pickerInstance);
+    }
+
+    next() {
+        const pickerInstance = window.M.Datepicker.getInstance(this.monthPicker.current);
+        this.props.nextMonth(pickerInstance);
+    }
+
     render() {
         return (
             <div className="date-header">
-                <i className="material-icons">arrow_back</i>
+                <i className="material-icons" onClick={this.prev}>arrow_back</i>
                 <input type="text" className="datepicker dashboard" ref={this.monthPicker}></input>
-                <i className="material-icons">arrow_forward</i>
+                <i className="material-icons" onClick={this.next}>arrow_forward</i>
             </div>
         )
     }
@@ -49,15 +62,17 @@ class CategoryChart extends React.Component {
     }
 
     createChart() {
+        const spendingMapKeys = Object.keys(this.props.spendingMap);
+
         new Chart(this.chart.current, {
             type: 'pie',
             data: {
                 datasets: [{
-                    data: Object.keys(this.props.spendingMap).map(key => this.props.spendingMap[key]),
-                    backgroundColor: colors.pieChart.slice(0, Object.keys(this.props.spendingMap).length),
+                    data: spendingMapKeys.map(key => this.props.spendingMap[key]),
+                    backgroundColor: colors.pieChart.slice(0, spendingMapKeys.length),
                     borderWidth: 1
                 }],
-                labels: Object.keys(this.props.spendingMap)
+                labels: spendingMapKeys
             },
             options: {
                 legend: {
@@ -72,18 +87,32 @@ class CategoryChart extends React.Component {
     }
 
     componentDidMount() {
-        this.createChart();
+        if (this.isSpendingData()) {
+            this.createChart();
+        }
     }
 
     componentDidUpdate() {
-        this.createChart();
+        Chart.helpers.each(Chart.instances, (instance) => {
+            instance.destroy();
+        });
+
+        if (this.isSpendingData()) { 
+            this.createChart(); 
+        }
     }
+
+    isSpendingData = () => Object.keys(this.props.spendingMap).length > 0;
 
     render() {
         return (
             <div className="chart-container dash-container">
                 <h5 className="section-title">Expense Chart</h5>
-                <canvas ref={this.chart}></canvas>
+                {
+                    this.isSpendingData() ?
+                        <canvas ref={this.chart}></canvas> :
+                        <h6 className="no-data">No expense data for current month.</h6>
+                }
             </div>
         );
     }
@@ -172,6 +201,8 @@ class Main extends React.Component {
         super();
 
         this.changeDate = this.changeDate.bind(this);
+        this.prevMonth = this.prevMonth.bind(this);
+        this.nextMonth = this.nextMonth.bind(this);
 
         const initialState = this.computeBudgetItems(new Date(), props);
         this.state = initialState;
@@ -224,16 +255,51 @@ class Main extends React.Component {
         this.computeBudgetItems(new Date(date));
     }
 
+    prevMonth(pickerInstance) {
+        const date = new Date(pickerInstance.date);
+        date.setMonth(date.getMonth() - 1);
+        this.updateValueAndState(pickerInstance, date);
+    }
+
+    nextMonth(pickerInstance) {
+        const date = new Date(pickerInstance.date);
+        date.setMonth(date.getMonth() + 1);
+        this.updateValueAndState(pickerInstance, date);
+    }
+
+    updateValueAndState(pickerInstance, newDate) {
+        pickerInstance.setDate(newDate);
+
+        const prevMonth = months[newDate.getMonth()];
+        const prevYear = newDate.getFullYear();
+
+        pickerInstance.$el[0].value = prevMonth + ' ' + prevYear;
+
+        this.computeBudgetItems(newDate);
+    }
+
     render() {
         return (
             <div className="main animate__animated animate__fadeIn animate__faster">
                 <Navigation />
                 <div className="main-content">
                     <div className="dash-row">
-                        <DateHeader month={this.state.month} year={this.state.year} changeDate={this.changeDate} />
+                        <DateHeader
+                            month={this.state.month}
+                            year={this.state.year}
+                            changeDate={this.changeDate}
+                            prevMonth={this.prevMonth}
+                            nextMonth={this.nextMonth}
+                        />
                     </div>
                     <div className="dash-row">
-                        <BudgetStatus total={this.state.total} spent={this.state.spent} remainingValue={this.state.remaining} remainingText={this.state.remainingText} remainingColor={this.state.remainingColor} />
+                        <BudgetStatus
+                            total={this.state.total}
+                            spent={this.state.spent}
+                            remainingValue={this.state.remaining}
+                            remainingText={this.state.remainingText}
+                            remainingColor={this.state.remainingColor}
+                        />
                         <CategoryChart spendingMap={this.state.spendingMap} />
                     </div>
                     <div className="dash-row">
