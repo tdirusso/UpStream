@@ -95,9 +95,6 @@ export default class CreatBudget extends React.Component {
 
 				ipcRenderer.send('budget:create', {
 					income: this.state.income,
-					incomeRemaining: this.state.incomeRemaining,
-					incomeAllocated: this.state.incomeAllocated,
-					overBudget: this.state.overBudget,
 					categories: this.state.categories
 				});
 			});

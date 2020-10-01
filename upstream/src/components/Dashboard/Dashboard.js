@@ -3,57 +3,11 @@ import Loader from '../Loader/Loader';
 import './Dashboard.css';
 import Chart from 'chart.js';
 import Navigation from '../Navigation/Navigation';
+import DatePicker from '../DatePicker/DatePicker';
 import { months, colors } from '../../constants/constants';
 import { calcSpent, calcCategoryExpenses, calcSpendingMap } from '../../utils/budget-utils';
 
 const { ipcRenderer } = window.require('electron');
-
-class DateHeader extends React.Component {
-    constructor() {
-        super();
-        this.monthPicker = React.createRef();
-
-        this.prev = this.prev.bind(this);
-        this.next = this.next.bind(this);
-    }
-
-    componentDidMount() {
-        const picker = this.monthPicker.current;
-        const month = this.props.month;
-        const year = this.props.year;
-        const defaultDate = new Date(month + ' ' + year);
-
-        window.M.Datepicker.init(picker, {
-            defaultDate: defaultDate,
-            setDefaultDate: true,
-            format: 'mmmm yyyy',
-            onClose: () => {
-                const date = this.monthPicker.current.value
-                this.props.changeDate(date);
-            }
-        });
-    }
-
-    prev() {
-        const pickerInstance = window.M.Datepicker.getInstance(this.monthPicker.current);
-        this.props.prevMonth(pickerInstance);
-    }
-
-    next() {
-        const pickerInstance = window.M.Datepicker.getInstance(this.monthPicker.current);
-        this.props.nextMonth(pickerInstance);
-    }
-
-    render() {
-        return (
-            <div className="date-header">
-                <i className="material-icons" onClick={this.prev}>arrow_back</i>
-                <input type="text" className="datepicker dashboard" ref={this.monthPicker}></input>
-                <i className="material-icons" onClick={this.next}>arrow_forward</i>
-            </div>
-        )
-    }
-}
 
 class CategoryChart extends React.Component {
     constructor() {
@@ -192,7 +146,7 @@ function BudgetTable(props) {
     );
 }
 
-class Main extends React.Component {
+class DashboardMain extends React.Component {
     constructor(props) {
         super();
 
@@ -222,18 +176,20 @@ class Main extends React.Component {
         const month = months[date.getMonth()];
         const year = date.getFullYear();
         const entryKey = `${month.toLowerCase()}-${year}`;
-        const entries = this.props.budget.entries[entryKey] || [];
+        const entriesObj = this.props.budget.entries[entryKey] || {};
 
-        const total = this.props.budget.income;
-        const spent = calcSpent(entries);
+        const expenses = entriesObj.expenses || [];
+
+        const total = entriesObj.income || '0.00';
+        const spent = calcSpent(expenses);
         const remaining = (parseFloat(total) - parseFloat(spent)).toFixed(2);
         const remainingColor = remaining < 0 ? colors.overBudget : colors.underBudget;
         const remainingText = remaining < 0 ? Math.abs(remaining) : remaining;
 
-        const categories = this.props.budget.categories;
-        const categoryExpenses = calcCategoryExpenses(entries, categories);
+        const categories = entriesObj.categories || [];
+        const categoryExpenses = calcCategoryExpenses(expenses, categories);
 
-        const spendingMap = calcSpendingMap(entries);
+        const spendingMap = calcSpendingMap(expenses);
 
         const stateObject = {
             total,
@@ -285,18 +241,18 @@ class Main extends React.Component {
 
     render() {
         return (
-            <div className="main animate__animated animate__fadeIn animate__faster">
-                <div className="main-content">
-                    <div className="dash-row">
-                        <DateHeader
+            <div className="dash-main animate__animated animate__fadeIn animate__faster">
+                <div className="dash-main-content">
+                    <div className="main-row">
+                        <DatePicker
                             month={this.state.month}
                             year={this.state.year}
                             changeDate={this.changeDate}
-                            prevMonth={this.prevMonth}
-                            nextMonth={this.nextMonth}
+                            prev={this.prevMonth}
+                            next={this.nextMonth}
                         />
                     </div>
-                    <div className="dash-row">
+                    <div className="main-row">
                         <BudgetStatus
                             total={this.state.total}
                             spent={this.state.spent}
@@ -306,7 +262,7 @@ class Main extends React.Component {
                         />
                         <CategoryChart spendingMap={this.state.spendingMap} />
                     </div>
-                    <div className="dash-row">
+                    <div className="main-row">
                         <BudgetTable categoryExpenses={this.state.categoryExpenses} />
                     </div>
                 </div>
@@ -343,7 +299,7 @@ export default class Dashboard extends React.Component {
                         <div style={{ marginLeft: '200px' }}>
                             <Loader />
                         </div> :
-                        <Main budget={this.state.budget} />
+                        <DashboardMain budget={this.state.budget} />
                 }
             </div>
         );

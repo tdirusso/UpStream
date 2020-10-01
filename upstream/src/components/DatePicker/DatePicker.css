@@ -1,0 +1,23 @@
+.datepicker {
+    text-align: center !important;
+    font-size: 28px !important;
+    cursor: pointer !important;
+    font-weight: 200 !important;
+    border-bottom: none !important;
+}
+
+.date-header {
+    display: flex;
+}
+
+.date-header i {
+    position: relative;
+    top: 10px;
+    margin: 0 5px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.datepicker-modal {
+    margin-left: 250px !important;
+}

@@ -80,3 +80,21 @@ tr:last-child {
 .datepicker-cancel, .datepicker-clear, .datepicker-today, .datepicker-done, .dropdown-content li>a, .dropdown-content li>span {
 	color: #00d0d0;
 }
+
+.collapsible-body {
+	background: white !important;
+}
+
+.collapsible-header {
+	font-size: 22px;
+	font-weight: 300;
+}
+
+.delete-icon {
+	color: #ff5555;
+	cursor: pointer;
+}
+
+.collapsible-header i {
+	margin: 0 !important;
+}

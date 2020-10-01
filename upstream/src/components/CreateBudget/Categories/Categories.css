@@ -4,7 +4,7 @@
 }
 
 .categories .collection-item {
-    padding: 5px 20px;
+    padding: 10px 30px;
 }
 
 .income-remaining-container {
@@ -55,9 +55,7 @@
 }
 
 .categories .delete-icon {
-    color: #ff5555;
     float: right;
-    cursor: pointer;
 }
 
 .categories-list {

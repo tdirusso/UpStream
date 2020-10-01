@@ -2,6 +2,21 @@ const electron = require('electron');
 const fs = require('fs');
 const { app, BrowserWindow } = electron;
 
+const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+];
+
 const appData = app.getPath('appData');
 
 class UpStreamController {
@@ -48,11 +63,20 @@ class UpStreamController {
         this.window.focus();
     }
 
-    createBudget(budget) {
-        if (!budget.incomeRemaining) budget.incomeRemaining = budget.income;
-        if (!budget.incomeSpent) budget.incomeSpent = '0.00';
-        budget.created = new Date();
+    createBudget(budgetData) {
+        const { categories, income } = budgetData;
+
+        const budget = {};
+        const now = new Date();
+
+        budget.created = now;
         budget.entries = {};
+
+        const initialEntryKey = months[now.getMonth()].toLowerCase() + '-' + now.getFullYear();
+
+        budget.entries[initialEntryKey] = { income, categories };
+        budget.entries[initialEntryKey].expenses = [];
+
         fs.writeFileSync(this.paths.budget, JSON.stringify(budget));
         this.budget = budget;
     }

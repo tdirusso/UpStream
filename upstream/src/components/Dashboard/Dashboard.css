@@ -1,17 +1,16 @@
-.main {
-    background: #f2f2f2;
+.dash-main {
     height: 100%;
     width: 100%;
 }
 
-.main-content {
+.dash-main-content {
     margin-left: 200px;
     padding: 50px;
     height: 100%;
     padding-top: 25px;
 }
 
-.dash-row {
+.main-row {
     display: flex;
     justify-content: center;
 }
@@ -87,26 +86,6 @@ table.status td {
 
 .progress .overBudget {
     background-color: #ff5555 !important;
-}
-
-.dashboard.datepicker {
-    text-align: center !important;
-    font-size: 28px !important;
-    cursor: pointer !important;
-    font-weight: 200 !important;
-    border-bottom: none !important;
-}
-
-.date-header {
-    display: flex;
-}
-
-.date-header i {
-    position: relative;
-    top: 10px;
-    margin: 0 5px;
-    cursor: pointer;
-    user-select: none;
 }
 
 .chart-container .no-data {

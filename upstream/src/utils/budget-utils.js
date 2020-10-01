@@ -7,11 +7,11 @@ String.prototype.toDollarString = function () {
 module.exports = {
     checkE: (event) => event.keyCode === 69 ? event.preventDefault() : null,
 
-    calcSpent: (entries) => entries.reduce((previous, current) => (previous + parseFloat(current.amount)), 0).toFixed(2),
+    calcSpent: (expenses) => expenses.reduce((previous, current) => (previous + parseFloat(current.amount)), 0).toFixed(2),
 
-    calcCategoryExpenses: (entries, categories) => {
+    calcCategoryExpenses: (expenses, categories) => {
         return categories.map(category => {
-            const spent = entries.reduce((previous, current) => {
+            const spent = expenses.reduce((previous, current) => {
                 if (current.category === category.name) {
                     return previous + parseFloat(current.amount)
                 }
@@ -29,13 +29,13 @@ module.exports = {
                 percentage: percentage,
                 statusColor: remaining < 0 ? colors.overBudget : colors.underBudget
             };
-        });
+        }).sort((a, b) => (a.name > b.name) ? 1 : -1);
     },
 
-    calcSpendingMap: (entries) => {
+    calcSpendingMap: (expenses) => {
         const spendingMap = {};
 
-        entries.forEach(entry => {
+        expenses.forEach(entry => {
             const spent = spendingMap[entry.category];
             if (!spent) {
                 spendingMap[entry.category] = entry.amount;
