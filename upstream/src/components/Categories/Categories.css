@@ -14,11 +14,36 @@
     flex-basis: 100%;
 }
 
+.expense-table tr, .expense-table th, .expense-table td {
+    padding: 3px 5px;
+}
 
-.expense-table tr{
+.expense-table tr {
     cursor: pointer;
 }
 
-.add-item-btn {
-    margin: 10px 0;
+.add-expense-btn {
+    margin-top: 25px;
+}
+
+.edit-category-btn {
+    margin-bottom: 25px;
+}
+
+.add-expense-btn span, .edit-category-btn span{
+    font-weight: 200;
+    margin-left: 7px;
+}
+
+.import-button, .save-button, .category-button {
+    margin: 15px 0;
+}
+
+.import-button {
+    margin-right: auto;
+    margin-left: 15px;
+}
+
+.save-button a {
+    background: steelblue;
 }

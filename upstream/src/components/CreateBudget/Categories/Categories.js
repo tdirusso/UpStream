@@ -17,7 +17,7 @@ export const DefaultCategory = class DefaulCategory extends React.Component {
                     onBlur={this.props.handleInputChange}>
                 </input>
                 <div className="secondary-content">
-                    <i className="material-icons delete-icon" onClick={this.props.handleDelete} category={this.props.category}>remove_circle_outline</i>
+                    <i className="material-icons delete-icon" onClick={this.props.handleDelete} category={this.props.category}>clear</i>
                 </div>
             </li>
         );
@@ -48,7 +48,7 @@ export const CustomCategory = class CustomCategory extends React.Component {
                     onBlur={this.props.handleInputChange}>
                 </input>
                 <div className="secondary-content">
-                    <i className="material-icons delete-icon" onClick={this.props.handleDelete} index={this.props.index}>remove_circle_outline</i>
+                    <i className="material-icons delete-icon" onClick={this.props.handleDelete} index={this.props.index}>clear</i>
                 </div>
             </li>
         );

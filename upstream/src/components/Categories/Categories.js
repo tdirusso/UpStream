@@ -25,10 +25,7 @@ function ExpensesTable(props) {
                             <tr key={key}>
                                 <td>{expense.date}</td>
                                 <td>{expense.name}</td>
-                                <td>{expense.amount}</td>
-                                <td>
-                                    <i className="material-icons delete-icon">remove_circle_outline</i>
-                                </td>
+                                <td>{expense.amount.toDollarString()}</td>
                             </tr>
                         )
                     })
@@ -49,14 +46,55 @@ function CategoriesList(props) {
                     {category.name}
                 </div>
                 <div className="collapsible-body">
+                    <div className="edit-category-btn">
+                        <a className="btn-floating btn-small waves-effect waves-light">
+                            <i className="material-icons">edit</i>
+                        </a>
+                        <span>Edit Category</span>
+                    </div>
                     <ExpensesTable expenses={categoryExpenses} />
-                    <a className="btn-floating btn waves-effect waves-light add-item-btn">
-                        <i className="material-icons">add</i>
-                    </a>
+                    <div className="add-expense-btn">
+                        <a className="btn-floating btn-small waves-effect waves-light">
+                            <i className="material-icons">add</i>
+                        </a>
+                        <span>Add Expense</span>
+                    </div>
                 </div>
             </li>
         )
-    })
+    });
+}
+
+function CopyLastMonthButton() {
+    return (
+        <div className="copy-button">
+            <a className="waves-effect waves-light btn-large" href="#0" onClick={(event) => { }}>Copy Categories and Income from Last Month</a>
+        </div>
+    );
+}
+
+function ImportButton() {
+    return (
+        <div className="import-button">
+            <a className="waves-effect waves-light btn-large" href="#0" onClick={(event) => { }}>Import Expenses</a>
+        </div>
+    );
+}
+
+function SaveButton() {
+    return (
+        <div className="save-button">
+            <a className="waves-effect waves-light btn-large" href="#0" onClick={(event) => { }}>Save</a>
+        </div>
+    );
+}
+
+function AddCategoryButton() {
+    return (
+        <div className="category-button">
+            <a className="waves-effect waves-light btn-large" href="#0" onClick={(event) => { }}>Add Category</a>
+        </div>
+    );
 }
 
 class CategoriesMain extends React.Component {
@@ -70,11 +108,28 @@ class CategoriesMain extends React.Component {
             initialDate = new Date(savedDate);
         }
 
-        const month = months[initialDate.getMonth()];
-        const year = initialDate.getFullYear();
+        const initialState = this.computeBudgetItems(initialDate, props);
+        this.state = initialState;
 
-        const entryKey = month.toLowerCase() + '-' + year;
-        const entriesObj = props.budget.entries[entryKey] || {};
+        this.categoriesList = React.createRef();
+        this.changeDate = this.changeDate.bind(this);
+        this.prevMonth = this.prevMonth.bind(this);
+        this.nextMonth = this.nextMonth.bind(this);
+    }
+
+    computeBudgetItems(date, props) {
+        let returnInitialState = false;
+
+        if (typeof this.props === 'undefined') {
+            returnInitialState = true;
+            this.props = props;
+        };
+
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+
+        const entryKey = `${month.toLowerCase()}-${year}`;
+        const entriesObj = this.props.budget.entries[entryKey] || {};
 
         const categories = entriesObj.categories || [];
         categories.sort((a, b) => (a.name > b.name) ? 1 : -1);
@@ -82,7 +137,7 @@ class CategoriesMain extends React.Component {
         const expenses = entriesObj.expenses || [];
         const income = entriesObj.income || '0.00';
 
-        const initialState = {
+        const stateObject = {
             month,
             year,
             categories,
@@ -90,9 +145,21 @@ class CategoriesMain extends React.Component {
             income
         };
 
-        this.state = initialState;
+        sessionStorage.setItem('categories-date', date);
 
-        this.categoriesList = React.createRef();
+        if (returnInitialState) {
+            return stateObject;
+        } else {
+            this.setState(stateObject, () => {
+                if (this.state.collapsible) {
+                    const collapsible = this.state.collapsible;
+                    const firstCategory = collapsible.el.firstChild;
+                    if (firstCategory && !firstCategory.className.includes('active')) {
+                        collapsible.open(0);
+                    }
+                }
+            });
+        }
     }
 
     componentDidMount() {
@@ -103,21 +170,41 @@ class CategoriesMain extends React.Component {
         });
 
         instance.open(0);
+        this.setState({ collapsible: instance });
     }
 
-    changeDate() {
-
+    changeDate(date) {
+        this.computeBudgetItems(new Date(date));
     }
 
-    prevMonth() {
-
+    prevMonth(pickerInstance) {
+        const date = new Date(pickerInstance.date);
+        date.setMonth(date.getMonth() - 1);
+        this.updateValueAndState(pickerInstance, date);
     }
 
-    nextMonth() {
+    nextMonth(pickerInstance) {
+        const date = new Date(pickerInstance.date);
+        date.setMonth(date.getMonth() + 1);
+        this.updateValueAndState(pickerInstance, date);
+    }
 
+    updateValueAndState(pickerInstance, newDate) {
+        pickerInstance.setDate(newDate);
+
+        const prevMonth = months[newDate.getMonth()];
+        const prevYear = newDate.getFullYear();
+
+        pickerInstance.$el[0].value = prevMonth + ' ' + prevYear;
+
+        this.computeBudgetItems(newDate);
     }
 
     render() {
+        const categories = this.state.categories;
+        const displayIfCategories = categories.length === 0 ? { display: 'none' } : { display: 'flex' };
+        const displayIfNoCategories = categories.length === 0 ? { display: 'flex' } : { display: 'none' };
+
         return (
             <div className="categories-main animate__animated animate__fadeIn animate__faster">
                 <div className="categories-main-content">
@@ -133,33 +220,27 @@ class CategoriesMain extends React.Component {
                     <div className="main-row">
                         <h5>Total Income {this.state.income.toDollarString()}</h5>
                     </div>
-                    <div className="main-row">
+                    <div className="main-row" style={displayIfNoCategories}>
+                        <CopyLastMonthButton />
+                    </div>
+                    <div className="main-row" style={displayIfCategories}>
                         <ul className="collapsible main-categories-list" ref={this.categoriesList}>
                             <CategoriesList categories={this.state.categories} expenses={this.state.expenses} />
                         </ul>
                     </div>
-                    <div className="main-row">
-                        <div className="import-button">
-                            <a className="waves-effect waves-light btn-large" href="#0" onClick={(event) => { }}>Save</a>
-                        </div>
+                    <div className="main-row" style={displayIfCategories}>
+                        <AddCategoryButton />
+                        <ImportButton />
+                        <SaveButton />
                     </div>
-
-                    {/* <div className="main-row">
-                        <div className="import-button">
-                            <a className="waves-effect waves-light btn-large" href="#0" onClick={(event) => { }}>Import</a>
-                        </div>
+                    <div className="main-row" style={displayIfNoCategories}>
+                        <AddCategoryButton />
                     </div>
-                    <div className="main-row">
-                        <div className="import-button">
-                            <a className="waves-effect waves-light btn-large" href="#0" onClick={(event) => { }}>Copy Last Month's Categories &amp; Income</a>
-                        </div>
-                    </div>*/}
                 </div>
             </div>
         );
     }
 }
-
 
 export default class Categories extends React.Component {
 
