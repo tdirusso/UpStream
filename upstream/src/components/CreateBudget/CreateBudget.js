@@ -65,17 +65,17 @@ export default class CreatBudget extends React.Component {
 	submit(event) {
 		event.preventDefault();
 
-		const allocationInputs = document.querySelectorAll('.allocation');
+		const allocationInputs = window.$$('.allocation');
 		allocationInputs.forEach(allocation => { if (!allocation.value) allocation.value = '0.00' });
 
-		const invalidInput = document.querySelector('.invalid');
+		const invalidInput = window.$('.invalid');
 
 		if (invalidInput) {
 			invalidInput.focus();
 			return;
 		}
 
-		const categoryRows = document.querySelectorAll('.categories-list.collection-item');
+		const categoryRows = window.$$('.categories-list.collection-item');
 
 		const categories = Array.from(categoryRows).map(categoryRow => {
 			const categoryNameElement = categoryRow.firstChild;

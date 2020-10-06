@@ -35,3 +35,7 @@ ipcMain.on('budget:create', (_, budgetData) => {
 });
 
 ipcMain.handle('budget:get', () => USController.budget);
+
+ipcMain.handle('income:save', (_, { income, key }) => USController.saveIncome(income, key));
+
+ipcMain.handle('category:update', (_, { oldName, newName, allocation, key }) => USController.updateCategory(oldName, newName, allocation, key));

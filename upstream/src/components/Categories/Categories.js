@@ -4,71 +4,19 @@ import Navigation from '../Navigation/Navigation';
 import Loader from '../Loader/Loader';
 import DatePicker from '../DatePicker/DatePicker';
 import { months } from '../../constants/constants';
+import Modals from './Modals/Modals';
+import CategoriesList from './CategoriesList';
 
 const { ipcRenderer } = window.require('electron');
-
-function ExpensesTable(props) {
-    return (
-        <table className="highlight expense-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {
-                    props.expenses.map((expense, index) => {
-                        const key = `${expense.category}-expense-${index}`;
-                        return (
-                            <tr key={key}>
-                                <td>{expense.date}</td>
-                                <td>{expense.name}</td>
-                                <td>{expense.amount.toDollarString()}</td>
-                            </tr>
-                        )
-                    })
-                }
-            </tbody>
-        </table>
-    )
-}
-
-function CategoriesList(props) {
-    return props.categories.map(category => {
-        const categoryExpenses = props.expenses.filter(expense => expense.category === category.name);
-        categoryExpenses.sort((a, b) => (Date.parse(a.date) > Date.parse(b.date)) ? 1 : -1);
-
-        return (
-            <li key={category.name}>
-                <div className="collapsible-header">
-                    {category.name}
-                </div>
-                <div className="collapsible-body">
-                    <div className="edit-category-btn">
-                        <a className="btn-floating btn-small waves-effect waves-light">
-                            <i className="material-icons">edit</i>
-                        </a>
-                        <span>Edit Category</span>
-                    </div>
-                    <ExpensesTable expenses={categoryExpenses} />
-                    <div className="add-expense-btn">
-                        <a className="btn-floating btn-small waves-effect waves-light">
-                            <i className="material-icons">add</i>
-                        </a>
-                        <span>Add Expense</span>
-                    </div>
-                </div>
-            </li>
-        )
-    });
-}
 
 function CopyLastMonthButton() {
     return (
         <div className="copy-button">
-            <a className="waves-effect waves-light btn-large" href="#0" onClick={(event) => { }}>Copy Categories and Income from Last Month</a>
+            <a className="waves-effect waves-light btn-large"
+                href="#0"
+                onClick={(event) => { }}>
+                Copy Categories and Income from Last Month
+            </a>
         </div>
     );
 }
@@ -76,15 +24,11 @@ function CopyLastMonthButton() {
 function ImportButton() {
     return (
         <div className="import-button">
-            <a className="waves-effect waves-light btn-large" href="#0" onClick={(event) => { }}>Import Expenses</a>
-        </div>
-    );
-}
-
-function SaveButton() {
-    return (
-        <div className="save-button">
-            <a className="waves-effect waves-light btn-large" href="#0" onClick={(event) => { }}>Save</a>
+            <a className="waves-effect waves-light btn-large"
+                href="#0"
+                onClick={(event) => { }}>
+                Import Expenses
+            </a>
         </div>
     );
 }
@@ -92,7 +36,24 @@ function SaveButton() {
 function AddCategoryButton() {
     return (
         <div className="category-button">
-            <a className="waves-effect waves-light btn-large" href="#0" onClick={(event) => { }}>Add Category</a>
+            <a className="waves-effect waves-light btn-large"
+                href="#0"
+                onClick={(event) => { }}>
+                Add Category
+            </a>
+        </div>
+    );
+}
+
+function EditIncomeButton(props) {
+    return (
+        <div className="edit-income-btn">
+            <span>Edit Income</span>
+            <a className="btn-floating btn-small waves-effect waves-light"
+                href="#0"
+                onClick={(event) => props.handleClick(event)}>
+                <i className="material-icons">attach_money</i>
+            </a>
         </div>
     );
 }
@@ -115,6 +76,27 @@ class CategoriesMain extends React.Component {
         this.changeDate = this.changeDate.bind(this);
         this.prevMonth = this.prevMonth.bind(this);
         this.nextMonth = this.nextMonth.bind(this);
+        this.saveIncome = this.saveIncome.bind(this);
+        this.updateCategory = this.updateCategory.bind(this);
+        this.openModal = this.openModal.bind(this);
+    }
+
+    componentDidMount() {
+        const list = this.categoriesList.current;
+        const collapsible = window.M.Collapsible.init(list, {
+            accordion: false
+        });
+        collapsible.open(0);
+
+        const modals = window.$$('.input-modal');
+        window.M.Modal.init(modals, {});
+
+        this.setState({ collapsible });
+    }
+
+    openModal(event, id, modalParams) {
+        event.preventDefault();
+        this.setState({ modalParams }, () => window.M.Modal.getInstance(window.$(`#${id}`)).open());
     }
 
     computeBudgetItems(date, props) {
@@ -137,12 +119,16 @@ class CategoriesMain extends React.Component {
         const expenses = entriesObj.expenses || [];
         const income = entriesObj.income || '0.00';
 
+        const totalSpent = expenses.reduce((prev, cur) => prev + parseFloat(cur.amount), 0).toFixed(2);
+
         const stateObject = {
             month,
             year,
             categories,
             expenses,
-            income
+            income,
+            totalSpent,
+            entryKey
         };
 
         sessionStorage.setItem('categories-date', date);
@@ -160,17 +146,6 @@ class CategoriesMain extends React.Component {
                 }
             });
         }
-    }
-
-    componentDidMount() {
-        const list = this.categoriesList.current;
-
-        const instance = window.M.Collapsible.init(list, {
-            accordion: false
-        });
-
-        instance.open(0);
-        this.setState({ collapsible: instance });
     }
 
     changeDate(date) {
@@ -200,10 +175,60 @@ class CategoriesMain extends React.Component {
         this.computeBudgetItems(newDate);
     }
 
+    saveIncome(income, modal) {
+        const key = this.state.entryKey;
+
+        ipcRenderer.invoke('income:save', { income, key })
+            .then((isSaved) => {
+                if (isSaved) {
+                    modal.close();
+                    this.setState({ income });
+                }
+            });
+    }
+
+    updateCategory(oldName, newName, allocation, modal) {
+        const key = this.state.entryKey;
+
+        ipcRenderer.invoke('category:update', { oldName, newName, allocation, key })
+            .then((isSaved) => {
+                if (isSaved) {
+                    modal.close();
+                    const categories = this.state.categories;
+                    const expenses = this.state.expenses;
+
+                    categories.some(category => {
+                        if (category.name === oldName) {
+                            category.allocation = allocation;
+                            if (newName !== oldName) {
+                                category.name = newName;
+                            }
+                            return true;
+                        }
+                    });
+
+                    expenses.forEach(expense => {
+                        if (expense.category === oldName) {
+                            expense.category = newName;
+                        }
+                    });
+
+                    this.setState({ categories, expenses });
+                }
+            });
+    }
+
     render() {
         const categories = this.state.categories;
         const displayIfCategories = categories.length === 0 ? { display: 'none' } : { display: 'flex' };
         const displayIfNoCategories = categories.length === 0 ? { display: 'flex' } : { display: 'none' };
+
+        let progressWidth = '0%';
+        if (this.state.income !== '0.00') {
+            progressWidth = (parseFloat(this.state.totalSpent) / parseFloat(this.state.income) * 100).toFixed(2) + '%';
+        }
+
+        const progressStatusClass = parseFloat(progressWidth) <= 100 ? 'underBudget' : 'overBudget';
 
         return (
             <div className="categories-main animate__animated animate__fadeIn animate__faster">
@@ -217,25 +242,37 @@ class CategoriesMain extends React.Component {
                             next={this.nextMonth}
                         />
                     </div>
+                    <div className="main-row category-progress">
+                        <h5>{this.state.totalSpent.toDollarString()}</h5>
+                        <div className="progress">
+                            <div className={`determinate ${progressStatusClass}`} style={{ width: progressWidth }}></div>
+                        </div>
+                        <h5>{this.state.income.toDollarString()}</h5>
+                    </div>
                     <div className="main-row">
-                        <h5>Total Income {this.state.income.toDollarString()}</h5>
+                        <EditIncomeButton handleClick={(event) => this.openModal(event, 'edit-income-modal')} />
                     </div>
                     <div className="main-row" style={displayIfNoCategories}>
                         <CopyLastMonthButton />
                     </div>
                     <div className="main-row" style={displayIfCategories}>
                         <ul className="collapsible main-categories-list" ref={this.categoriesList}>
-                            <CategoriesList categories={this.state.categories} expenses={this.state.expenses} />
+                            <CategoriesList categories={this.state.categories} expenses={this.state.expenses} modalOpener={this.openModal} />
                         </ul>
                     </div>
                     <div className="main-row" style={displayIfCategories}>
                         <AddCategoryButton />
                         <ImportButton />
-                        <SaveButton />
                     </div>
                     <div className="main-row" style={displayIfNoCategories}>
                         <AddCategoryButton />
                     </div>
+                    <Modals
+                        curData={this.state}
+                        modalParams={this.state.modalParams}
+                        saveIncome={this.saveIncome}
+                        updateCategory={this.updateCategory}
+                    />
                 </div>
             </div>
         );

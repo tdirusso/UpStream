@@ -1,6 +1,7 @@
 const colors = require('../constants/constants');
 
 String.prototype.toDollarString = function () {
+    if (isNaN(this)) return '$ 0.00';
     return `$ ${this.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 };
 

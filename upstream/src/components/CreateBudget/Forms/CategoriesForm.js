@@ -26,7 +26,7 @@ export default class CategoriesForm extends React.Component {
     updateProgress() {
         const income = this.props.state.income;
 
-        const allocationInputs = Array.from(document.getElementsByClassName('allocation'));
+        const allocationInputs = Array.from(window.$$('.allocation'));
         const incomeAllocated = allocationInputs.reduce((total, currentField) => {
             let amount = currentField.value;
             if (amount) {
@@ -82,7 +82,7 @@ export default class CategoriesForm extends React.Component {
         );
 
         this.props.setState({ customCategories: currentCustomCategories }, () => {
-            const customInputs = document.getElementsByClassName('custom-category-input');
+            const customInputs = window.$$('.custom-category-input');
             const lastInput = customInputs[customInputs.length - 1];
             if (lastInput) {
                 lastInput.focus();

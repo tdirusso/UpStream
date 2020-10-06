@@ -22,6 +22,10 @@
     cursor: pointer;
 }
 
+.expense-table td {
+    font-weight: 300;
+}
+
 .add-expense-btn {
     margin-top: 25px;
 }
@@ -30,9 +34,21 @@
     margin-bottom: 25px;
 }
 
-.add-expense-btn span, .edit-category-btn span{
+.add-expense-btn span, .edit-category-btn span {
     font-weight: 200;
     margin-left: 7px;
+}
+
+.edit-income-btn span {
+    margin-right: 7px;
+    font-weight: 200;
+}
+
+.edit-income-btn {
+    margin-left: auto;
+    margin-right: 30px;
+    margin-top: 10px;
+    margin-bottom: 15px;
 }
 
 .import-button, .save-button, .category-button {
@@ -40,10 +56,84 @@
 }
 
 .import-button {
-    margin-right: auto;
     margin-left: 15px;
 }
 
 .save-button a {
     background: steelblue;
+}
+
+.category-progress {
+    white-space: nowrap;
+    align-items: center;
+}
+
+.category-progress h5 {
+    margin: 0 30px;
+}
+
+.category-progress .progress {
+    margin: 0;
+    height: 10px;
+    border-radius: 10px;
+}
+
+.category-status {
+    margin-left: auto;
+}
+
+.input-modal .modal-content {
+    text-align: center;
+}
+
+.input-modal .modal-footer {
+    display: flex;
+    padding: 4px 25px;
+}
+
+.modal-save {
+    margin-left: auto !important;
+}
+
+.modal-close {
+    background: #ff5555;
+}
+
+.modal-close:hover {
+    background: #d43333;
+}
+
+.edit-income-field {
+    text-align: center;
+    font-size: 22px !important;
+    font-weight: 200;
+}
+
+#edit-income-modal h4 {
+    margin: 0;
+}
+
+.categories-main .modal-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100% - 60px);
+    flex-direction: column;
+}
+
+.income-input-container {
+    width: 60%;
+}
+
+.income-input-label,.allocation-input-label {
+    margin-right: 20px;
+    font-weight: 200;
+    color: #00d0d0;
+    font-size: 18px;
+}
+
+.edit-category-field input {
+    text-align: center;
+    font-size: 22px !important;
+    font-weight: 200;
 }

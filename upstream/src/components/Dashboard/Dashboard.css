@@ -84,10 +84,6 @@ table.status td {
     margin: 0;
 }
 
-.progress .overBudget {
-    background-color: #ff5555 !important;
-}
-
 .chart-container .no-data {
     text-align: center;
     margin-top: 50px;

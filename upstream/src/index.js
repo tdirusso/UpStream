@@ -7,6 +7,9 @@ import Dashboard from './components/Dashboard/Dashboard';
 import Categories from './components/Categories/Categories';
 import { HashRouter, Route } from 'react-router-dom';
 
+window.$ = document.querySelector.bind(document);
+window.$$ = document.querySelectorAll.bind(document);
+
 ReactDOM.render(
 	<React.StrictMode>
 		<HashRouter>

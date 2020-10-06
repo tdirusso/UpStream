@@ -80,6 +80,52 @@ class UpStreamController {
         fs.writeFileSync(this.paths.budget, JSON.stringify(budget));
         this.budget = budget;
     }
+
+    saveIncome(income, key) {
+        const entriesObj = this.budget.entries[key];
+
+        if (entriesObj) {
+            entriesObj.income = income;
+            this.budget.entries[key] = entriesObj;
+        } else {
+            this.budget.entries[key] = {
+                income: income,
+                categories: [],
+                expenses: []
+            }
+        }
+
+        fs.writeFileSync(this.paths.budget, JSON.stringify(this.budget));
+        return true;
+    }
+
+    updateCategory(oldName, newName, allocation, key) {
+        const entriesObj = this.budget.entries[key];
+        const categories = entriesObj.categories;
+        const expenses = entriesObj.expenses;
+
+        categories.some(category => {
+            if (category.name === oldName) {
+                category.allocation = allocation;
+                if (newName !== oldName) {
+                    category.name = newName;
+                }
+                return true;
+            }
+        });
+
+        expenses.forEach(expense => {
+            if (expense.category === oldName) {
+                expense.category = newName;
+            }
+        });
+
+        this.budget.entries[key].categories = categories;
+        this.budget.entries[key].expenses = expenses;
+
+        fs.writeFileSync(this.paths.budget, JSON.stringify(this.budget));
+        return true;
+    }
 };
 
 module.exports = new UpStreamController();

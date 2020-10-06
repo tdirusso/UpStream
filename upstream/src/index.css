@@ -98,6 +98,11 @@ tr:last-child {
 .collapsible-header i {
 	margin: 0 !important;
 }
+
 .collapsible {
 	border-top: none;
+}
+
+.progress .overBudget {
+	background-color: #ff5555 !important;
 }
