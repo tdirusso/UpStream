@@ -106,3 +106,7 @@ tr:last-child {
 .progress .overBudget {
 	background-color: #ff5555 !important;
 }
+
+.txt-center {
+	text-align: center !important;
+}

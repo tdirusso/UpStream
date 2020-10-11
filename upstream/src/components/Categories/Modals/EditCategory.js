@@ -16,10 +16,8 @@ export default class EditCategory extends React.Component {
     }
 
     componentDidUpdate() {
-        const paramsPassed = this.props.params !== undefined;
-        const setParamState = this.state.category !== undefined;
-
-        if (paramsPassed && !setParamState) {
+        const params = this.props.params;
+        if (params && params.category !== this.state.category) {
             this.setState({
                 category: this.props.params.category,
                 categories: this.props.categories,

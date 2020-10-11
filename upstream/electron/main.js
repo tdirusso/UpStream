@@ -26,7 +26,7 @@ ipcMain.on('intro:done', () => {
         } else {
             USController.showView(USController.views.createBudget);
         }
-    }, 3500);
+    }, 1500);
 });
 
 ipcMain.on('budget:create', (_, budgetData) => {

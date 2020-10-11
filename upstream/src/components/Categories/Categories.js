@@ -14,7 +14,7 @@ function CopyLastMonthButton() {
         <div className="copy-button">
             <a className="waves-effect waves-light btn-large"
                 href="#0"
-                onClick={(event) => { }}>
+                onClick={() => { }}>
                 Copy Categories and Income from Last Month
             </a>
         </div>
@@ -26,7 +26,7 @@ function ImportButton() {
         <div className="import-button">
             <a className="waves-effect waves-light btn-large"
                 href="#0"
-                onClick={(event) => { }}>
+                onClick={() => { }}>
                 Import Expenses
             </a>
         </div>
@@ -38,7 +38,7 @@ function AddCategoryButton() {
         <div className="category-button">
             <a className="waves-effect waves-light btn-large"
                 href="#0"
-                onClick={(event) => { }}>
+                onClick={() => { }}>
                 Add Category
             </a>
         </div>
@@ -50,8 +50,7 @@ function EditIncomeButton(props) {
         <div className="edit-income-btn">
             <span>Edit Income</span>
             <a className="btn-floating btn-small waves-effect waves-light"
-                href="#0"
-                onClick={(event) => props.handleClick(event)}>
+                onClick={props.handleClick}>
                 <i className="material-icons">attach_money</i>
             </a>
         </div>
@@ -94,8 +93,7 @@ class CategoriesMain extends React.Component {
         this.setState({ collapsible });
     }
 
-    openModal(event, id, modalParams) {
-        event.preventDefault();
+    openModal(id, modalParams) {
         this.setState({ modalParams }, () => window.M.Modal.getInstance(window.$(`#${id}`)).open());
     }
 
@@ -218,6 +216,10 @@ class CategoriesMain extends React.Component {
             });
     }
 
+    saveExpense({ name, amount, category, date }, modal) {
+        console.log('saving');
+    }
+
     render() {
         const categories = this.state.categories;
         const displayIfCategories = categories.length === 0 ? { display: 'none' } : { display: 'flex' };
@@ -250,7 +252,7 @@ class CategoriesMain extends React.Component {
                         <h5>{this.state.income.toDollarString()}</h5>
                     </div>
                     <div className="main-row">
-                        <EditIncomeButton handleClick={(event) => this.openModal(event, 'edit-income-modal')} />
+                        <EditIncomeButton handleClick={() => this.openModal('edit-income-modal')} />
                     </div>
                     <div className="main-row" style={displayIfNoCategories}>
                         <CopyLastMonthButton />
@@ -271,6 +273,7 @@ class CategoriesMain extends React.Component {
                         curData={this.state}
                         modalParams={this.state.modalParams}
                         saveIncome={this.saveIncome}
+                        saveExpense={this.saveExpense}
                         updateCategory={this.updateCategory}
                     />
                 </div>

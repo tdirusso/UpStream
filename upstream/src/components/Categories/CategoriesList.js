@@ -2,10 +2,13 @@ import React from 'react';
 import colors from '../../constants/constants';
 import ExpensesTable from './ExpensesTable';
 
-function AddExpenseButton() {
+function AddExpenseButton(props) {
     return (
         <div className="add-expense-btn">
-            <a className="btn-floating btn-small waves-effect waves-light" href="#0">
+            <a
+                className="btn-floating btn-small waves-effect waves-light"
+                onClick={() => props.modalOpener('add-expense-modal', props.params)}
+            >
                 <i className="material-icons">add</i>
             </a>
             <span>Add Expense</span>
@@ -41,14 +44,14 @@ export default function CategoriesList(props) {
                     <div className="edit-category-btn">
                         <a
                             className="btn-floating btn-small waves-effect waves-light"
-                            onClick={(event) => props.modalOpener(event, 'edit-category-modal', modalParams)}
+                            onClick={() => props.modalOpener('edit-category-modal', modalParams)}
                         >
                             <i className="material-icons">edit</i>
                         </a>
                         <span>Edit Category</span>
                     </div>
                     <ExpensesTable expenses={categoryExpenses} />
-                    <AddExpenseButton />
+                    <AddExpenseButton modalOpener={props.modalOpener} params={{ category: modalParams.category }} />
                 </div>
             </li>
         )

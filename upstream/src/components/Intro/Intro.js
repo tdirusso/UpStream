@@ -25,7 +25,7 @@ export default class Intro extends React.Component {
 				const introDone = () => {
 					vertLine.removeEventListener('transitionend', introDone);
 					vertLine.classList.add('show-arrow');
-					container.classList.add('animate__animated', 'animate__fadeOut', 'animate__delay-3s', 'animate__faster');
+					container.classList.add('animate__animated', 'animate__fadeOut', 'animate__delay-1s', 'animate__faster');
 					ipcRenderer.send('intro:done');
 				};
 
