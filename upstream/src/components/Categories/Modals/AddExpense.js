@@ -9,14 +9,13 @@ export default class AddExpense extends React.Component {
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleAmountChange = this.handleAmountChange.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
-        // this.save = this.save.bind(this);
+        this.save = this.save.bind(this);
 
         this.state = {
             expenseName: '',
             expenseAmount: '',
-            expenseDate: ''
+            expenseDate: this.getTodayString()
         };
-
     }
 
     componentDidUpdate() {
@@ -26,9 +25,16 @@ export default class AddExpense extends React.Component {
                 category: this.props.params.category,
                 expenseName: '',
                 expenseAmount: '',
-                expenseDate: ''
+                expenseDate: this.getTodayString()
             });
         }
+    }
+
+    getTodayString() {
+        const date = new Date();
+        return date.getFullYear() + '-' +
+            ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+            ('0' + date.getDate()).slice(-2);
     }
 
     handleNameChange(event) {
@@ -43,35 +49,39 @@ export default class AddExpense extends React.Component {
         this.setState({ expenseDate: event.target.value });
     }
 
-    // save() {
-    //     const modal = window.M.Modal.getInstance(window.$('#edit-category-modal'));
-    //     const category = this.state.category;
-    //     const allocation = this.state.allocation;
-    //     const categories = this.state.categories;
-    //     const oldCategory = this.props.params.category;
+    save() {
+        const modal = window.M.Modal.getInstance(window.$('#add-expense-modal'));
+        const category = this.state.category;
+        const expenseName = this.state.expenseName;
+        const expenseDate = this.state.expenseDate;
+        const expenseAmount = this.state.expenseAmount || 0.00;
 
-    //     const duplicate = categories.some(existingCategory => existingCategory.name === category && category !== oldCategory);
+        if (!expenseName) {
+            alert(`Please enter a name for the new ${category} expense.`);
+            return;
+        }
 
-    //     if (duplicate) {
-    //         alert(`You already have a "${category}" category created for this month.`);
-    //         return;
-    //     }
+        this.props.save(expenseName, parseFloat(expenseAmount).toFixed(2), expenseDate, category, modal);
 
-    //     this.props.save(oldCategory, category, allocation, modal);
-    // }
+        setTimeout(() => {
+            this.setState({
+                expenseName: '',
+                expenseAmount: '',
+                expenseDate: this.getTodayString()
+            });
+        }, 500);
+    }
 
     render() {
         const date = new Date();
-        const defaultDateVal = date.getFullYear() + '-' +
-            ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
-            ('0' + date.getDate()).slice(-2);
-
         const minDateVal = date.getFullYear() + '-' +
             ('0' + (date.getMonth() + 1)).slice(-2) + '-01';
 
         const maxDateVal = date.getFullYear() + '-' +
             ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
-            (new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate())
+            (new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate());
+
+        const expenseValue = this.state.expenseAmount || '0.00';
 
         return (
             <div>
@@ -103,14 +113,14 @@ export default class AddExpense extends React.Component {
                                     min="0.01"
                                     max={Number.MAX_SAFE_INTEGER}
                                     step="0.01"
-                                    value={this.state.expenseAmount}
+                                    value={expenseValue}
                                     onChange={this.handleAmountChange}
                                     onKeyDown={checkE}
                                 ></input>
                                 <input
                                     className="txt-center"
                                     type="date"
-                                    value={this.state.expenseDate || defaultDateVal}
+                                    value={this.state.expenseDate}
                                     style={{ paddingLeft: '25px' }}
                                     onChange={this.handleDateChange}
                                     max={maxDateVal}
@@ -121,7 +131,7 @@ export default class AddExpense extends React.Component {
                     </div>
                     <div className="modal-footer">
                         <a className="waves-effect waves-light btn modal-close">Cancel</a>
-                        <a className="waves-effect waves-light btn modal-save" >Save</a>
+                        <a className="waves-effect waves-light btn modal-save" onClick={this.save}>Save</a>
                     </div>
                 </div>
             </div>

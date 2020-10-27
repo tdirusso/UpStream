@@ -11,8 +11,8 @@ export default class Modals extends React.Component {
         return (
             <div>
                 <EditIncomeModal income={this.props.curData.income} save={this.props.saveIncome} entryKey={this.props.curData.entryKey} />
-                <AddCategoryModal params={this.props.modalParams} save={this.props.saveExpense} />
-                <AddExpenseModal params={this.props.modalParams} />
+                <AddCategoryModal params={this.props.modalParams} />
+                <AddExpenseModal params={this.props.modalParams} save={this.props.saveExpense} />
                 <EditCategoryModal params={this.props.modalParams} categories={this.props.curData.categories} save={this.props.updateCategory} />
                 <EditExpenseModal />
                 <ImportModal />

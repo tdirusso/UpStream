@@ -30,12 +30,12 @@ export default class EditIncome extends React.Component {
 
     save() {
         const modal = window.M.Modal.getInstance(window.$('#edit-income-modal'));
-        const income = this.state.income;
-        this.props.save(income, modal);
+        const income = this.state.income || 0.00;
+        this.props.save(parseFloat(income).toFixed(2), modal);
     }
 
     render() {
-        const incomeValue = this.state.income ? this.state.income : '0.00';
+        const incomeValue = this.state.income || '0.00';
 
         return (
             <div>
@@ -53,7 +53,7 @@ export default class EditIncome extends React.Component {
                                     min="0.01"
                                     max={Number.MAX_SAFE_INTEGER}
                                     step="0.01"
-                                    value={this.state.income}
+                                    value={incomeValue}
                                     onChange={this.handleChange}
                                     onKeyDown={checkE}
                                 ></input>

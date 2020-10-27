@@ -17,11 +17,21 @@ export default class EditCategory extends React.Component {
 
     componentDidUpdate() {
         const params = this.props.params;
-        if (params && params.category !== this.state.category) {
+        const isCategorySet = this.state.category !== undefined;
+
+        let isNewParams = false;
+        if (this.state.originalCategory) {
+            isNewParams = this.state.originalCategory !== params.category;
+        }
+
+        const isDifferentCategory = params && params.category !== this.state.category;
+
+        if ((isDifferentCategory && !isCategorySet) || isNewParams) {
             this.setState({
-                category: this.props.params.category,
+                category: params.category,
                 categories: this.props.categories,
-                allocation: this.props.params.allocation
+                allocation: params.allocation,
+                originalCategory: params.category
             });
         }
     }
@@ -37,9 +47,14 @@ export default class EditCategory extends React.Component {
     save() {
         const modal = window.M.Modal.getInstance(window.$('#edit-category-modal'));
         const category = this.state.category;
-        const allocation = this.state.allocation;
+        const allocation = this.state.allocation || 0.00;
         const categories = this.state.categories;
         const oldCategory = this.props.params.category;
+
+        if (!category) {
+            alert('Please enter a new name for the category or press cancel.');
+            return;
+        }
 
         const duplicate = categories.some(existingCategory => existingCategory.name === category && category !== oldCategory);
 
@@ -48,13 +63,13 @@ export default class EditCategory extends React.Component {
             return;
         }
 
-        this.props.save(oldCategory, category, allocation, modal);
+        this.props.save(oldCategory, category, parseFloat(allocation).toFixed(2), modal);
     }
 
     render() {
 
-        const categoryValue = this.state.category ? this.state.category : '';
-        const allocationValue = this.state.allocation ? this.state.allocation : '0.00';
+        const categoryValue = this.state.category || '';
+        const allocationValue = this.state.allocation || '0.00';
 
         return (
             <div>

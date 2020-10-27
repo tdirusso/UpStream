@@ -216,8 +216,8 @@ class CategoriesMain extends React.Component {
             });
     }
 
-    saveExpense({ name, amount, category, date }, modal) {
-        console.log('saving');
+    saveExpense(name, amount, date, category, modal) {
+        modal.close();
     }
 
     render() {
